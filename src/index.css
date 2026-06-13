@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  --vp-primary: #FD0083;
+  --vp-dark-bg: #010d11;
+  --vp-light-bg: #f4f4f4;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--vp-light-bg);
+  color: #1a1a1a;
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.dark body {
+  background-color: var(--vp-dark-bg);
+  color: white;
+}
+
+/* Scrollbar Personalizado fucsia */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #012a33; }
+::-webkit-scrollbar-thumb { 
+  background: var(--vp-primary); 
+  border-radius: 10px; 
+}
+
+/* Estilo para los inputs de tipo fecha nativos */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(1); /* Hace que el icono del calendario sea blanco */
+  opacity: 0.5;
+  margin-right: 5px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.dark input {
+  background-color: #011a22;
+  color: white;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+@layer utilities {
+  .animate-scroll-infinite {
+    display: flex;
+    width: max-content;
+    animation: scroll 30s linear infinite;
+  }
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50%)); }
+  }
+}
