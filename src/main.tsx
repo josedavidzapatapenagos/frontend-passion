@@ -1,14 +1,14 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { ThemeProvider as NextThemesProvider } from "next-themes"
-import './index.css'
-import App from './App'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    {/* Dejamos solo este, que es el que controla la clase .dark */}
-    <NextThemesProvider attribute="class" defaultTheme="dark">
+import App from "./App";
+import "./index.css";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <BrowserRouter>
       <App />
-    </NextThemesProvider>
-  </StrictMode>,
-)
+    </BrowserRouter>
+  </React.StrictMode>
+);

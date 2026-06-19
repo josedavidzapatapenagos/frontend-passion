@@ -16,14 +16,13 @@ export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  // Efecto para Resetear cuando cambias de país/catálogo
   useEffect(() => {
     setPosts([]);
     setPage(0);
     setHasMore(true);
   }, [catalogId]);
 
-  // Carga de Datos con Filtro Anti-Duplicados
+
   useEffect(() => {
     if (!catalogId || !hasMore || isLoading) return;
 
@@ -43,7 +42,7 @@ export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
     });
   }, [catalogId, page]);
 
-  // Detector de Scroll (Intersection Observer)
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       // Si el sensor es visible Y no estamos cargando ya algo, pedimos la siguiente página
@@ -68,7 +67,7 @@ export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
             onSelect={onPostClick} 
           />
           
-          {/* Despliegue del detalle con efecto de continuidad */}
+
           {viewingPostId === post.id && (
             <div className="w-full bg-white rounded-b-[5rem] -mt-16 pt-24 pb-12 shadow-2xl z-0 animate-in fade-in slide-in-from-top-4 duration-500">
                <PostDetailView postId={post.id} />
@@ -77,7 +76,7 @@ export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
         </div>
       ))}
 
-      {/* Sensor de Scroll e Indicador de Carga */}
+
       <div ref={loaderRef} className="py-20 flex justify-center w-full">
         {isLoading && (
           <div className="flex flex-col items-center gap-4">
