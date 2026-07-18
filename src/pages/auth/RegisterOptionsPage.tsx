@@ -1,0 +1,1 @@
+export { RegisterOptionsPage } from "../RegisterOptionsPage";

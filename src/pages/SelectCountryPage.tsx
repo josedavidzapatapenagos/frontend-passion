@@ -1,16 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import { RegisterStepOne } from "../components/RegisterStepOne";
+import { ThemeSwitcher } from "../components/ThemeSwitcher";
+import { persistSelectedCountry } from "../services/navigationFlow";
 
 export const SelectCountryPage = () => {
   const navigate = useNavigate();
 
-const handleSelection = (catalogId: string) => {
-  localStorage.setItem("catalogId", catalogId);
+  const handleSelection = (catalogId: string) => {
+    persistSelectedCountry(catalogId);
 
-  navigate("/age-verification");
-};
+    navigate("/age-verification");
+  };
+
   return (
-    <div className="min-h-screen bg-[#013440]">
+    <div className="min-h-screen vp-page-bg">
+      <div className="mx-auto flex w-full max-w-6xl justify-end px-4 pt-4">
+        <ThemeSwitcher />
+      </div>
+
       <RegisterStepOne
         onSelectionComplete={handleSelection}
       />

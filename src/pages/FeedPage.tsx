@@ -1,33 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Feed } from "../components/Feed";
+import { readSelectedCountry } from "../services/navigationFlow";
 
 export const FeedPage = () => {
-  const navigate = useNavigate();
-
-  const [catalogId, setCatalogId] = useState<string | null>(null);
+  const catalogId = readSelectedCountry();
   const [viewingPostId, setViewingPostId] =
     useState<string | null>(null);
-
-  useEffect(() => {
-    const savedCatalog =
-      localStorage.getItem("catalogId");
-
-    const isAdult =
-      localStorage.getItem("isAdult");
-
-    if (!savedCatalog) {
-      navigate("/");
-      return;
-    }
-
-    if (isAdult !== "true") {
-      navigate("/age-verification");
-      return;
-    }
-
-    setCatalogId(savedCatalog);
-  }, [navigate]);
 
   const handlePostClick = (id: string) => {
     setViewingPostId((prev) =>

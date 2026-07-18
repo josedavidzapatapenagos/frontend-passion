@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getCatalogPosts, type Post } from '../services/catalogService';
+import { getUserFacingErrorMessage } from '../services/errorMapper';
+import { useNotification } from '../hooks/useNotification';
 import { PostCard } from './PostCard';
 import { PostDetailView } from './PostDetail';
 
@@ -10,36 +12,64 @@ interface FeedProps {
 }
 
 export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
+  const { error: notifyError } = useNotification();
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
+  const hasMoreRef = useRef(hasMore);
+  const isLoadingRef = useRef(isLoading);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPosts([]);
     setPage(0);
     setHasMore(true);
+    hasMoreRef.current = true;
+    isLoadingRef.current = false;
   }, [catalogId]);
 
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
 
   useEffect(() => {
-    if (!catalogId || !hasMore || isLoading) return;
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
 
+  useEffect(() => {
+    if (!catalogId || !hasMoreRef.current || isLoadingRef.current) return;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
-    getCatalogPosts(catalogId, page).then(newPosts => {
-      if (newPosts.length === 0) {
-        setHasMore(false);
-      } else {
-        setPosts(prev => {
-          // Filtro de seguridad: Solo agregamos posts cuyo ID no esté ya en la lista
-          const existingIds = new Set(prev.map(p => p.id));
-          const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
-          return [...prev, ...uniqueNewPosts];
+
+    getCatalogPosts(catalogId, page)
+      .then(newPosts => {
+        if (newPosts.length === 0) {
+          setHasMore(false);
+        } else {
+          setPosts(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
+            return [...prev, ...uniqueNewPosts];
+          });
+        }
+      })
+      .catch((error: unknown) => {
+        notifyError({
+          title: "No pudimos cargar el catálogo",
+          description: getUserFacingErrorMessage(error, {
+            defaultMessage: "No pudimos cargar el catálogo en este momento.",
+            forbiddenMessage: "No tienes permisos para ver este catálogo.",
+          }),
         });
-      }
-      setIsLoading(false);
-    });
+
+        setHasMore(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [catalogId, page]);
 
 
@@ -69,8 +99,11 @@ export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
           
 
           {viewingPostId === post.id && (
-            <div className="w-full bg-white rounded-b-[5rem] -mt-16 pt-24 pb-12 shadow-2xl z-0 animate-in fade-in slide-in-from-top-4 duration-500">
-               <PostDetailView postId={post.id} />
+            <div className="w-full bg-slate-50 dark:bg-[#012a33] rounded-b-[5rem] -mt-16 pt-24 pb-12 shadow-2xl z-0 animate-in fade-in slide-in-from-top-4 duration-500 border border-slate-200 dark:border-white/10 border-t-0 transition-colors">
+               <PostDetailView
+                 postId={post.id}
+                 fallbackPost={post}
+               />
             </div>
           )}
         </div>

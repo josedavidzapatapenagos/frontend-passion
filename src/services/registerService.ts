@@ -11,7 +11,7 @@ export const registerModel = async (
   data: RegisterRequest
 ) => {
   const response = await apiClient.post(
-    "/model/account",
+    "/v1/models/accounts",
     data
   );
 

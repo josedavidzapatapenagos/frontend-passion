@@ -1,14 +1,24 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  isAdultConfirmed,
+  persistAdultConfirmation,
+} from "../services/navigationFlow";
 
 export const AgeVerificationPage = () => {
   const navigate = useNavigate();
 
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (isAdultConfirmed()) {
+      navigate("/feed", { replace: true });
+    }
+  }, [navigate]);
+
   const handleAdult = () => {
-    localStorage.setItem("isAdult", "true");
-    navigate("/feed");
+    persistAdultConfirmation();
+    navigate("/feed", { replace: true });
   };
 
   const handleMinor = () => {
@@ -18,14 +28,14 @@ export const AgeVerificationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#013440] flex items-center justify-center px-4">
+    <div className="min-h-screen vp-page-bg flex items-center justify-center px-4">
       <div className="w-full max-w-lg">
-        <div className="bg-[#012a33] border border-white/10 rounded-[2rem] p-10 shadow-2xl">
+        <div className="vp-surface border vp-border rounded-[2rem] p-10 shadow-2xl">
           <h1 className="text-[#FD0083] text-4xl font-black italic text-center mb-4">
             Verificación de Edad
           </h1>
 
-          <p className="text-center text-white/70 mb-8">
+          <p className="text-center vp-text-muted mb-8">
             Debes confirmar que eres mayor de edad para continuar.
           </p>
 
@@ -50,11 +60,11 @@ export const AgeVerificationPage = () => {
               onClick={handleMinor}
               className="
                 flex-1
-                bg-white/10
-                hover:bg-white/20
+                vp-surface-soft
+                hover:opacity-90
                 rounded-2xl
                 py-4
-                text-white
+                vp-text-primary
                 font-bold
                 transition-all
               "

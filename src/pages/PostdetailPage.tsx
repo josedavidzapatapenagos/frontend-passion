@@ -6,7 +6,7 @@ export const PostDetailPage = () => {
 
   if (!id) {
     return (
-      <div className="flex items-center justify-center h-screen text-white">
+      <div className="flex items-center justify-center h-screen vp-text-primary">
         Post no encontrado
       </div>
     );

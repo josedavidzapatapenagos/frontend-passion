@@ -9,10 +9,10 @@ export const FeedSkeleton = () => {
       {skeletons.map((_, index) => (
         <div 
           key={`skeleton-${index}`}
-          className="flex items-center bg-white/5 rounded-[4rem] p-4 animate-pulse border border-white/5"
+          className="flex items-center bg-slate-100 dark:bg-white/5 rounded-[4rem] p-4 animate-pulse border border-slate-200 dark:border-white/5"
         >
           {/* Círculo de la foto */}
-          <div className="w-24 h-24 rounded-full bg-white/10 flex-shrink-0" />
+          <div className="w-24 h-24 rounded-full bg-slate-200 dark:bg-white/10 flex-shrink-0" />
 
           {/* Contenido de texto al lado */}
           <div className="ml-6 flex-1 space-y-3">
@@ -23,7 +23,7 @@ export const FeedSkeleton = () => {
               <div className="h-4 w-16 bg-[#FD0183]/20 rounded-full" />
             </div>
             {/* Descripción corta (Línea de texto) */}
-            <div className="h-3 w-3/4 bg-white/5 rounded-full" />
+            <div className="h-3 w-3/4 bg-slate-200 dark:bg-white/5 rounded-full" />
           </div>
         </div>
       ))}

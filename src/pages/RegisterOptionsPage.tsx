@@ -4,7 +4,7 @@ export const RegisterOptionsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#013440] px-6 py-16">
+    <div className="min-h-screen vp-page-bg px-6 py-16">
 
       <div className="max-w-6xl mx-auto">
 
@@ -12,7 +12,7 @@ export const RegisterOptionsPage = () => {
 
         <div className="text-center mb-14">
 
-          <h1 className="text-5xl md:text-6xl font-black text-white">
+          <h1 className="text-5xl md:text-6xl font-black vp-text-primary">
             Bienvenido a
           </h1>
 
@@ -20,7 +20,7 @@ export const RegisterOptionsPage = () => {
             Virtual Passion
           </h2>
 
-          <p className="mt-6 text-white/60 max-w-2xl mx-auto text-lg">
+          <p className="mt-6 vp-text-muted max-w-2xl mx-auto text-lg">
             Una plataforma exclusiva donde creadores de contenido y seguidores
             pueden conectar de forma segura, privada y profesional.
           </p>
@@ -35,7 +35,7 @@ export const RegisterOptionsPage = () => {
 
           <div
             className="
-              bg-[#012a33]
+              vp-surface
               border border-[#FD0083]/20
               rounded-[2rem]
               p-8
@@ -65,7 +65,7 @@ export const RegisterOptionsPage = () => {
 
             </div>
 
-            <h2 className="text-4xl font-black text-white mb-3">
+            <h2 className="text-4xl font-black vp-text-primary mb-3">
               Modelo
             </h2>
 
@@ -73,13 +73,13 @@ export const RegisterOptionsPage = () => {
               Convierte tu contenido en ingresos.
             </p>
 
-            <p className="text-white/70 leading-relaxed mb-8">
+            <p className="vp-text-muted leading-relaxed mb-8">
               Crea tu perfil profesional, publica contenido exclusivo,
               construye tu comunidad y monetiza tu audiencia desde una
               plataforma diseñada para impulsar tu crecimiento.
             </p>
 
-            <div className="space-y-3 mb-8 text-white/70">
+            <div className="space-y-3 mb-8 vp-text-muted">
 
               <div>✓ Perfil profesional</div>
 
@@ -116,7 +116,7 @@ export const RegisterOptionsPage = () => {
 
           <div
             className="
-              bg-[#012a33]
+              vp-surface
               border border-[#00BCD4]/20
               rounded-[2rem]
               p-8
@@ -146,7 +146,7 @@ export const RegisterOptionsPage = () => {
 
             </div>
 
-            <h2 className="text-4xl font-black text-white mb-3">
+            <h2 className="text-4xl font-black vp-text-primary mb-3">
               Cliente VIP
             </h2>
 
@@ -154,12 +154,12 @@ export const RegisterOptionsPage = () => {
               Accede al mejor contenido exclusivo.
             </p>
 
-            <p className="text-white/70 leading-relaxed mb-8">
+            <p className="vp-text-muted leading-relaxed mb-8">
               Sigue a tus modelos favoritas, accede a contenido premium
               y disfruta de una experiencia privada diseñada para usuarios VIP.
             </p>
 
-            <div className="space-y-3 mb-8 text-white/70">
+            <div className="space-y-3 mb-8 vp-text-muted">
 
               <div>✓ Acceso a contenido exclusivo</div>
 

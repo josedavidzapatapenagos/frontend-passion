@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../hooks/useNotification";
+import { getUserFacingErrorMessage } from "../services/errorMapper";
 import { registerModel } from "../services/registerService";
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
+  const { success, error: notifyError } = useNotification();
 
   const [name, setName] = useState("");
   const [lastname, setLastname] = useState("");
@@ -13,9 +16,6 @@ export const RegisterPage = () => {
 
   const [loading, setLoading] =
     useState(false);
-
-  const [message, setMessage] =
-    useState("");
 
   const handleSubmit = async (
     e: React.FormEvent
@@ -32,24 +32,36 @@ export const RegisterPage = () => {
         password,
       });
 
-      setMessage(response.message);
+      success({
+        title: "Cuenta creada",
+        description: response.message,
+      });
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/login", {
+          state: {
+            email,
+            fromRegistration: true,
+          },
+        });
       }, 2000);
 
-    } catch (err: any) {
-      setMessage(
-        err.response?.data?.message ||
-        "Error al registrar cuenta"
-      );
+    } catch (err: unknown) {
+      notifyError({
+        title: "No pudimos crear la cuenta",
+        description: getUserFacingErrorMessage(err, {
+          defaultMessage: "No fue posible crear tu cuenta en este momento.",
+          badRequestMessage: "Revisa la información ingresada e inténtalo nuevamente.",
+          conflictMessage: "Ya existe una cuenta con esta información o su estado cambió.",
+        }),
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#013440] flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen vp-page-bg flex items-center justify-center px-4 relative overflow-hidden">
 
       {/* Glow fondo */}
       <div className="absolute w-96 h-96 bg-[#FD0083]/20 blur-[120px] rounded-full -top-20 -left-20" />
@@ -60,9 +72,9 @@ export const RegisterPage = () => {
           relative
           w-full
           max-w-lg
-          bg-[#012a33]/90
+          vp-surface
           backdrop-blur-xl
-          border border-white/10
+          border vp-border
           rounded-[2.5rem]
           p-10
           shadow-[0_30px_80px_rgba(0,0,0,0.35)]
@@ -74,7 +86,7 @@ export const RegisterPage = () => {
             Virtual Passion
           </h1>
 
-          <p className="text-white/50 uppercase tracking-[0.3em] text-xs mt-3 font-bold">
+          <p className="vp-text-muted uppercase tracking-[0.3em] text-xs mt-3 font-bold">
             Crear cuenta
           </p>
 
@@ -86,7 +98,7 @@ export const RegisterPage = () => {
         >
 
           <div>
-            <label className="block text-white/60 text-xs font-bold uppercase mb-2 tracking-wider">
+            <label className="block vp-text-muted text-xs font-bold uppercase mb-2 tracking-wider">
               Nombre
             </label>
 
@@ -99,11 +111,11 @@ export const RegisterPage = () => {
               placeholder="José"
               className="
                 w-full
-                bg-[#013440]
-                border border-white/10
+                vp-input
+                border
                 rounded-2xl
                 px-5 py-4
-                text-white
+                vp-text-primary
                 transition-all
                 focus:outline-none
                 focus:border-[#00BCD4]
@@ -113,7 +125,7 @@ export const RegisterPage = () => {
           </div>
 
           <div>
-            <label className="block text-white/60 text-xs font-bold uppercase mb-2 tracking-wider">
+            <label className="block vp-text-muted text-xs font-bold uppercase mb-2 tracking-wider">
               Apellido
             </label>
 
@@ -126,11 +138,11 @@ export const RegisterPage = () => {
               placeholder="Zapata"
               className="
                 w-full
-                bg-[#013440]
-                border border-white/10
+                vp-input
+                border
                 rounded-2xl
                 px-5 py-4
-                text-white
+                vp-text-primary
                 transition-all
                 focus:outline-none
                 focus:border-[#00BCD4]
@@ -140,7 +152,7 @@ export const RegisterPage = () => {
           </div>
 
           <div>
-            <label className="block text-white/60 text-xs font-bold uppercase mb-2 tracking-wider">
+            <label className="block vp-text-muted text-xs font-bold uppercase mb-2 tracking-wider">
               Correo electrónico
             </label>
 
@@ -153,11 +165,11 @@ export const RegisterPage = () => {
               placeholder="correo@ejemplo.com"
               className="
                 w-full
-                bg-[#013440]
-                border border-white/10
+                vp-input
+                border
                 rounded-2xl
                 px-5 py-4
-                text-white
+                vp-text-primary
                 transition-all
                 focus:outline-none
                 focus:border-[#00BCD4]
@@ -167,7 +179,7 @@ export const RegisterPage = () => {
           </div>
 
           <div>
-            <label className="block text-white/60 text-xs font-bold uppercase mb-2 tracking-wider">
+            <label className="block vp-text-muted text-xs font-bold uppercase mb-2 tracking-wider">
               Contraseña
             </label>
 
@@ -180,11 +192,11 @@ export const RegisterPage = () => {
               placeholder="********"
               className="
                 w-full
-                bg-[#013440]
-                border border-white/10
+                vp-input
+                border
                 rounded-2xl
                 px-5 py-4
-                text-white
+                vp-text-primary
                 transition-all
                 focus:outline-none
                 focus:border-[#00BCD4]
@@ -192,23 +204,6 @@ export const RegisterPage = () => {
               "
             />
           </div>
-
-          {message && (
-            <div
-              className="
-                bg-white/5
-                border border-white/10
-                rounded-xl
-                p-4
-                text-center
-                text-white/80
-                text-sm
-              "
-            >
-              {message}
-            </div>
-          )}
-
           <button
             type="submit"
             disabled={loading}
@@ -242,7 +237,7 @@ export const RegisterPage = () => {
               py-3
               text-[#00BCD4]
               font-bold
-              hover:text-white
+              hover:text-[#FD0083]
               transition-colors
             "
           >

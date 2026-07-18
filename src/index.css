@@ -1,9 +1,43 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --vp-primary: #FD0083;
   --vp-dark-bg: #010d11;
   --vp-light-bg: #f4f4f4;
+  --vp-main-bg-light: #ffffff;
+  --vp-main-bg-dark: #013440;
+  --vp-page-bg: #f4f4f4;
+  --vp-surface: #ffffff;
+  --vp-surface-soft: #f8fafc;
+  --vp-card-bg: #ffffff;
+  --vp-card-secondary: #f8fbfc;
+  --vp-border: rgba(15, 23, 42, 0.12);
+  --vp-text-primary: #0f172a;
+  --vp-text-secondary: #475569;
+  --vp-input-bg: #ffffff;
+  --vp-input-border: rgba(15, 23, 42, 0.14);
+  --vp-accent: #FD0083;
+  --vp-success: #0f9d68;
+  --vp-warning: #d19a00;
+  --vp-danger: #e11d48;
+}
+
+.dark {
+  --vp-page-bg: #013440;
+  --vp-surface: #012a33;
+  --vp-surface-soft: rgba(255, 255, 255, 0.05);
+  --vp-card-bg: #013440;
+  --vp-card-secondary: #012a33;
+  --vp-border: rgba(255, 255, 255, 0.1);
+  --vp-text-primary: #ffffff;
+  --vp-text-secondary: rgba(255, 255, 255, 0.72);
+  --vp-input-bg: #013440;
+  --vp-input-border: rgba(255, 255, 255, 0.12);
+  --vp-accent: #FD0083;
+  --vp-success: #62d79a;
+  --vp-warning: #f4c94d;
+  --vp-danger: #fb7185;
 }
 
 html, body, #root {
@@ -14,16 +48,129 @@ html, body, #root {
 }
 
 body {
-  background-color: var(--vp-light-bg);
-  color: #1a1a1a;
+  background-color: var(--vp-page-bg);
+  color: var(--vp-text-primary);
   overflow-x: hidden;
   transition: background-color 0.4s ease, color 0.4s ease;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
 .dark body {
-  background-color: var(--vp-dark-bg);
+  background-color: var(--vp-page-bg);
+  color: var(--vp-text-primary);
+}
+
+body,
+main,
+aside,
+section,
+article,
+header,
+footer,
+nav,
+div,
+button,
+input,
+textarea,
+select,
+label,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span {
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+}
+
+.vp-main-layout {
+  background-color: var(--vp-main-bg-light);
+  transition: background-color 0.35s ease;
+}
+
+.dark .vp-main-layout {
+  background-color: var(--vp-main-bg-dark);
+}
+
+.vp-page-bg {
+  background-color: var(--vp-page-bg);
+}
+
+.vp-surface {
+  background-color: var(--vp-surface);
+}
+
+.vp-surface-soft {
+  background-color: var(--vp-surface-soft);
+}
+
+.vp-card-bg {
+  background: linear-gradient(180deg, var(--vp-card-bg), var(--vp-card-secondary));
+}
+
+.vp-card-secondary {
+  background-color: var(--vp-card-secondary);
+}
+
+.vp-border {
+  border-color: var(--vp-border);
+}
+
+.vp-text-primary {
+  color: var(--vp-text-primary);
+}
+
+.vp-text-secondary {
+  color: var(--vp-text-secondary);
+}
+
+.vp-accent {
+  color: var(--vp-accent);
+}
+
+.vp-button-primary {
+  background-color: var(--vp-accent);
   color: white;
+}
+
+.vp-button-secondary {
+  background-color: color-mix(in srgb, var(--vp-card-secondary) 92%, transparent);
+  border: 1px solid var(--vp-border);
+  color: var(--vp-text-primary);
+}
+
+.vp-status-chip {
+  border: 1px solid transparent;
+  background-color: color-mix(in srgb, currentColor 14%, transparent);
+  color: currentColor;
+}
+
+.vp-status-success {
+  color: var(--vp-success);
+  border-color: color-mix(in srgb, var(--vp-success) 30%, transparent);
+}
+
+.vp-status-warning {
+  color: var(--vp-warning);
+  border-color: color-mix(in srgb, var(--vp-warning) 30%, transparent);
+}
+
+.vp-status-danger {
+  color: var(--vp-danger);
+  border-color: color-mix(in srgb, var(--vp-danger) 30%, transparent);
+}
+
+.vp-status-neutral {
+  color: var(--vp-text-secondary);
+  border-color: var(--vp-border);
+}
+
+.vp-input {
+  background-color: var(--vp-input-bg);
+  border-color: var(--vp-input-border);
+  color: var(--vp-text-primary);
 }
 
 /* Scrollbar Personalizado fucsia */
@@ -53,6 +200,30 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 @layer utilities {
+  @keyframes notification-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-18px) scale(0.98);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes notification-out {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateY(-12px) scale(0.98);
+    }
+  }
+
   .animate-scroll-infinite {
     display: flex;
     width: max-content;

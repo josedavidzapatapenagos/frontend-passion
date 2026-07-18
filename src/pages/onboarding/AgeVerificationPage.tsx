@@ -1,0 +1,1 @@
+export { AgeVerificationPage } from "../AgeVerificationPage";
