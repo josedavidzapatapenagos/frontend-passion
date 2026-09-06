@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useSession } from "./hooks/useSession";
-import { setSessionExpiredEmissionEnabled } from "./api/apiClient";
-import { AppRoutes } from "./routers/AppRoutes";
+import { setSessionExpiredEmissionEnabled } from "@/services/apiClient";
+import { AppRoutes } from "@/app/routes/AppRoutes";
 import {
-  AUTH_SESSION_KEY,
   clearStoredAuth,
   validateStoredSession,
-} from "./services/authService";
+} from "@/features/auth/services/authService";
+import { readStoredAuthState } from "@/features/auth/services/authStorage";
 
 function App() {
   const { expireSession } = useSession();
@@ -15,11 +15,9 @@ function App() {
     let isCancelled = false;
 
     const bootstrapAuth = async (silentOnInvalid: boolean) => {
-      const hasToken = !!localStorage.getItem("token");
-      const hasSessionFlag = localStorage.getItem(AUTH_SESSION_KEY) === "true";
-      const hasSession = hasToken || hasSessionFlag;
+      const { isLogged } = readStoredAuthState();
 
-      if (!hasSession) {
+      if (!isLogged) {
         return;
       }
 

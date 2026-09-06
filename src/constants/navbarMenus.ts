@@ -3,23 +3,29 @@ export const ROLE_NAVBAR_MENUS = {
     { label: "Mi Perfil", path: "/account" },
     { label: "Explorar", path: "/feed" },
   ],
+  CLIENT: [
+    { label: "Mi Perfil", path: "/account" },
+    { label: "Explorar", path: "/feed" },
+    { label: "Premium", path: "/premium" },
+    { label: "Favoritos", path: "/favorites" },
+  ],
   MODEL: [
     { label: "Cuenta", path: "/account" },
     { label: "Perfil", path: "/profile" },
     { label: "Anuncios", path: "/ads" },
-    { label: "Área VIP", path: "/vip" },
+    { label: "VIP", path: "/vip/manage" },
   ],
   ADMIN: [
     { label: "Cuenta", path: "/account" },
     { label: "Administración anuncios", path: "/admin/ads" },
-    { label: "Administración planes de posicionamiento", path: "/admin/plans" },
+    { label: "Posicionamientos", path: "/admin/plans" },
     { label: "Verificación de identidad", path: "/admin/identity-verifications/pending" },
     { label: "Modelos", path: "/admin/models" },
   ],
   SUPER_ADMIN: [
     { label: "Cuenta", path: "/account" },
     { label: "Administración anuncios", path: "/admin/ads" },
-    { label: "Administración planes de posicionamiento", path: "/admin/plans" },
+    { label: "Posicionamientos", path: "/admin/plans" },
     { label: "Verificación de identidad", path: "/admin/identity-verifications/pending" },
     { label: "Modelos", path: "/admin/models" },
   ],
@@ -36,6 +42,7 @@ export const normalizeRole = (
     .replace("SUPERADMIN", "SUPER_ADMIN");
 
   if (normalized === "MODEL") return "MODEL";
+  if (normalized === "CLIENT") return "CLIENT";
   if (normalized === "ADMIN") return "ADMIN";
   if (normalized === "SUPER_ADMIN") return "SUPER_ADMIN";
 

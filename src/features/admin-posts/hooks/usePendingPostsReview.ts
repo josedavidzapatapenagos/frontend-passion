@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNotification } from "../../../hooks/useNotification";
+import { useNotification } from "@/hooks/useNotification";
 import {
   approvePendingPost,
   getPendingPostById,
   getPendingPosts,
   getPendingPostsErrorMessage,
   rejectPendingPost,
-} from "../services/adminPostsService";
+} from "@/features/admin-posts/services/adminPostsService";
 import {
   DEFAULT_PENDING_POSTS_PAGE,
   DEFAULT_PENDING_POSTS_PAGE_SIZE,

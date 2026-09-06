@@ -1,6 +1,6 @@
 import axios from "axios";
-import apiClient from "../../../api/apiClient";
-import { getUserFacingErrorMessage } from "../../../services/errorMapper";
+import apiClient from "@/services/apiClient";
+import { getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 import type {
   AdminPendingPostDetail,
   AdminPendingPostListItem,

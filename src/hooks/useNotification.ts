@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { NotificationPayload } from "../services/notificationService";
+import type { NotificationPayload } from "@/features/notifications/services/notificationService";
 
 export type NotificationContextValue = {
   notify: (payload: NotificationPayload) => void;

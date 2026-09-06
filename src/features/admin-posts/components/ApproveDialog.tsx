@@ -1,4 +1,4 @@
-import { ConfirmationDialog } from "../../../components/ConfirmationDialog";
+import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 
 type ApproveDialogProps = {
   open: boolean;

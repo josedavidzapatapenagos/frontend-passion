@@ -12,11 +12,13 @@ export type MyModelPost = {
   title?: string;
   description?: string;
   status?: MyModelPostStatus;
+  isOnline?: boolean;
   rejectionReason?: string;
   catalogId?: string;
   catalogName?: string;
   categoryName?: string;
   createdAt?: string;
+  deactivatedAt?: string;
   clickCount?: number;
   hasPremium?: boolean;
   premiumUntil?: string;

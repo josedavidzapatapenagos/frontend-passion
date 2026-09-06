@@ -1,8 +1,8 @@
 import type { AdminPendingPostDetail } from "../types/adminPosts";
-import { EmptyState } from "../../../components/EmptyState";
-import { InfoCard } from "../../../components/InfoCard";
-import { SkeletonLoader } from "../../../components/SkeletonLoader";
-import { StatusBadge } from "../../../components/StatusBadge";
+import { EmptyState } from "@/components/common/EmptyState";
+import { InfoCard } from "@/components/common/InfoCard";
+import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 type PendingPostDetailProps = {
   post: AdminPendingPostDetail | null;

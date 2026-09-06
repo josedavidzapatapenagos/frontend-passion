@@ -1,6 +1,6 @@
-import { STATUS_COLORS } from "../utils/statusColors";
-import { STATUS_ICONS } from "../utils/statusIcons";
-import { STATUS_LABELS } from "../utils/statusLabels";
+import { STATUS_COLORS } from "@/utils/statusColors";
+import { STATUS_ICONS } from "@/utils/statusIcons";
+import { STATUS_LABELS } from "@/utils/statusLabels";
 
 export type StatusTone = "success" | "info" | "warning" | "error" | "neutral";
 

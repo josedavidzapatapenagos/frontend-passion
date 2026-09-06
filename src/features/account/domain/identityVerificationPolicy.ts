@@ -1,4 +1,4 @@
-import type { IdentityVerificationStatus } from "../../../services/identityVerificationService";
+import type { IdentityVerificationStatus } from "@/features/identity-verification/services/identityVerificationService";
 
 export const isVerificationApproved = (
   status: IdentityVerificationStatus | null

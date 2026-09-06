@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCatalogs } from '../services/flagService';
+import { getCatalogs } from '@/features/onboarding/services/flagService';
 import type { Catalog } from '../types/models';
 import { useNotification } from './useNotification';
 

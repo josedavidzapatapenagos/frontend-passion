@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import type { ModelAdMode } from "../../../types/modelAds";
-import { EmptyState } from "../../../components/EmptyState";
-import { InfoCard } from "../../../components/InfoCard";
-import { SkeletonLoader } from "../../../components/SkeletonLoader";
-import { useConfirmDialog } from "../../../hooks/useConfirmDialog";
-import { useNotification } from "../../../hooks/useNotification";
-import type { UseModelAdFormReturn } from "../hooks/useModelAdForm";
+import type { ModelAdMode } from "@/features/model-ads/types/modelAds";
+import { EmptyState } from "@/components/common/EmptyState";
+import { InfoCard } from "@/components/common/InfoCard";
+import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
+import { useConfirmDialog } from "@/hooks/useConfirmDialog";
+import { useNotification } from "@/hooks/useNotification";
+import { AppIcon } from "@/components/ui/AppIcon";
+import { MODEL_AD_STATIC_SERVICES } from "@/features/model-ads/hooks/useModelAdForm";
+import type { UseModelAdFormReturn } from "@/features/model-ads/hooks/useModelAdForm";
 
 type Props = {
   form: UseModelAdFormReturn;
@@ -17,6 +19,9 @@ type Props = {
   submitLabel: string;
   requireConfirmation?: boolean;
   confirmationText?: string;
+  showDeactivateAction?: boolean;
+  onDeactivate?: () => void;
+  deactivating?: boolean;
 };
 
 export const ModelAdForm = ({
@@ -29,9 +34,13 @@ export const ModelAdForm = ({
   submitLabel,
   requireConfirmation = false,
   confirmationText,
+  showDeactivateAction = false,
+  onDeactivate,
+  deactivating = false,
 }: Props) => {
   const confirm = useConfirmDialog();
   const { success, error: notifyError } = useNotification();
+  const hasReachedPostPhotosLimit = mode === "edit" && form.postPhotos.length >= 5;
 
   useEffect(() => {
     if (!form.loadError) {
@@ -65,6 +74,18 @@ export const ModelAdForm = ({
       description: form.submitError,
     });
   }, [form.submitError, notifyError]);
+
+  useEffect(() => {
+    if (!form.photosError) {
+      return;
+    }
+
+    notifyError({
+      title: "No pudimos actualizar las fotografías",
+      description: form.photosError,
+    });
+    form.clearPhotosError();
+  }, [form, notifyError]);
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -226,12 +247,152 @@ export const ModelAdForm = ({
               description="Esta será la imagen principal que verán los usuarios."
               tone="info"
             />
-            {form.contents.length === 0 ? (
+            {mode === "edit" && (
+              <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-700 dark:text-white/80">
+                    Fotografías del anuncio ({form.postPhotos.length}/5)
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => form.setPhotoPickerOpen((prev) => !prev)}
+                    disabled={form.photosBusy || form.submitting || form.loadingData || hasReachedPostPhotosLimit}
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#00BCD4] px-4 py-2 text-xs font-black text-[#012a33] hover:opacity-90 disabled:opacity-60"
+                  >
+                    <AppIcon name="check" className="h-4 w-4" />
+                    {hasReachedPostPhotosLimit ? "Límite alcanzado" : "Agregar fotografía"}
+                  </button>
+                </div>
+
+                {hasReachedPostPhotosLimit && (
+                  <p className="mt-3 text-xs text-amber-700 dark:text-amber-300">
+                    Este anuncio ya tiene 5 fotografías, que es el máximo permitido.
+                  </p>
+                )}
+
+                {form.postPhotos.length === 0 ? (
+                  <p className="mt-3 text-xs text-slate-500 dark:text-white/65">
+                    Este anuncio aún no tiene fotografías asociadas.
+                  </p>
+                ) : (
+                  <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+                    {form.postPhotos.map((content) => {
+                      const isCover = form.coverPhotoContentId === content.id;
+
+                      return (
+                        <div
+                          key={content.id}
+                          className={`relative overflow-hidden rounded-xl border ${
+                            isCover
+                              ? "border-[#FD0083]"
+                              : "border-slate-200 dark:border-white/10"
+                          }`}
+                        >
+                          <img
+                            src={content.contentUrl}
+                            alt="Fotografía del anuncio"
+                            className="h-28 w-full object-cover"
+                          />
+                          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/45 p-2">
+                            <button
+                              type="button"
+                              onClick={() => form.setCoverPhotoContentId(content.id)}
+                              disabled={form.photosBusy || form.submitting}
+                              className={`rounded-md px-2 py-1 text-[10px] font-black uppercase tracking-wide ${
+                                isCover
+                                  ? "bg-[#FD0083] text-white"
+                                  : "bg-white/90 text-slate-800"
+                              }`}
+                            >
+                              {isCover ? "Portada" : "Marcar portada"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                void form.removePhotoFromPost(content.id);
+                              }}
+                              disabled={form.photosBusy || form.submitting}
+                              className="rounded-md bg-red-500/90 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-white"
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {form.photoPickerOpen && (
+                  <div className="mt-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0b3a44] p-4">
+                    <p className="text-xs uppercase tracking-[0.16em] font-bold text-slate-500 dark:text-white/60">
+                      Selector multimedia
+                    </p>
+
+                    {form.contents.length === 0 ? (
+                      <p className="mt-2 text-sm text-slate-600 dark:text-white/70">
+                        No hay imágenes disponibles en tu biblioteca multimedia.
+                      </p>
+                    ) : (
+                      <>
+                        <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+                          {form.contents.map((content) => {
+                            const selected = form.selectedPhotoIdsForAdd.includes(content.id);
+                            const alreadyAdded = form.postPhotos.some((photo) => photo.id === content.id);
+
+                            return (
+                              <button
+                                key={content.id}
+                                type="button"
+                                onClick={() => form.togglePhotoSelectionForAdd(content.id)}
+                                disabled={alreadyAdded || form.photosBusy || form.submitting}
+                                className={`relative overflow-hidden rounded-xl border-2 ${
+                                  selected
+                                    ? "border-[#FD0083]"
+                                    : "border-slate-200 dark:border-white/10"
+                                } disabled:opacity-50`}
+                              >
+                                <img src={content.contentUrl} alt="Contenido multimedia" className="h-24 w-full object-cover" />
+                                <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-1 text-[10px] font-bold text-white">
+                                  {alreadyAdded ? "Agregada" : selected ? "Seleccionada" : "Disponible"}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-4 flex flex-col-reverse gap-2 md:flex-row md:justify-end">
+                          <button
+                            type="button"
+                            onClick={() => form.setPhotoPickerOpen(false)}
+                            disabled={form.photosBusy}
+                            className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 dark:border-white/20 dark:text-white"
+                          >
+                            Cerrar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              void form.confirmAddPhotos();
+                            }}
+                            disabled={form.photosBusy || form.selectedPhotoIdsForAdd.length === 0}
+                            className="rounded-lg bg-[#FD0083] px-4 py-2 text-xs font-black text-white disabled:opacity-60"
+                          >
+                            {form.photosBusy ? "Agregando..." : "Agregar seleccionadas"}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {mode === "create" && form.contents.length === 0 ? (
               <EmptyState
                 title="No tienes imágenes disponibles"
                 description="Primero sube contenido a tu perfil para elegir una portada para el anuncio."
               />
-            ) : (
+            ) : mode === "create" ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {form.contents.map((content) => {
                   const selected = form.coverPhotoContentId === content.id;
@@ -260,7 +421,7 @@ export const ModelAdForm = ({
                   );
                 })}
               </div>
-            )}
+            ) : null}
 
             {form.formErrors.coverPhotoContentId && (
               <p className="text-xs text-red-700 dark:text-red-300">{form.formErrors.coverPhotoContentId}</p>
@@ -274,42 +435,31 @@ export const ModelAdForm = ({
               description="Selecciona todos los servicios incluidos en la publicación."
               tone="info"
             />
-            <div className="flex flex-col gap-3 md:max-w-lg">
-              <div className="flex gap-2">
-                <input
-                  value={form.serviceInput}
-                  onChange={(event) => form.setServiceInput(event.target.value)}
-                  disabled={form.submitting || form.loadingData}
-                  placeholder="Ej: SERVICE_UNO"
-                  className="flex-1 bg-white dark:bg-[#013440] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={form.handleAddService}
-                  disabled={form.submitting || form.loadingData}
-                  className="px-4 py-3 rounded-xl bg-[#00BCD4] text-[#012a33] font-bold hover:opacity-90"
-                >
-                  Agregar
-                </button>
-              </div>
-
+            <div className="flex flex-col gap-3 md:max-w-2xl">
               <div className="flex flex-wrap gap-2">
-                {form.services.map((service) => (
+                {MODEL_AD_STATIC_SERVICES.map((service) => {
+                  const selected = form.services.includes(service);
+
+                  return (
                   <button
                     type="button"
                     key={service}
                     onClick={() => form.toggleService(service)}
                     disabled={form.submitting || form.loadingData}
-                    className="px-3 py-2 rounded-full border text-xs font-bold bg-[#FD0083] text-white border-[#FD0083]"
-                    title="Quitar servicio"
+                    className={`px-3 py-2 rounded-full border text-xs font-bold transition ${
+                      selected
+                        ? "bg-[#FD0083] text-white border-[#FD0083]"
+                        : "bg-white text-slate-700 border-slate-300 dark:bg-white/10 dark:text-white dark:border-white/20"
+                    }`}
                   >
-                    {service} ✕
+                    {service.replaceAll("_", " ")}
                   </button>
-                ))}
+                );
+                })}
               </div>
 
               <p className="text-xs text-slate-500 dark:text-white/60">
-                Agrega los servicios que quieras incluir en la publicacion.
+                Selecciona uno o varios servicios entre las opciones disponibles.
               </p>
 
               {form.formErrors.services && (
@@ -326,6 +476,17 @@ export const ModelAdForm = ({
             />
           )}
           <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
+            {showDeactivateAction && mode === "edit" && onDeactivate && (
+              <button
+                type="button"
+                onClick={onDeactivate}
+                disabled={form.submitting || deactivating}
+                className="w-full md:w-auto px-5 py-3 rounded-xl border border-red-300 bg-red-50 text-red-700 font-black hover:opacity-90 dark:border-red-400/50 dark:bg-red-500/15 dark:text-red-200"
+              >
+                {deactivating ? "Desactivando..." : "Desactivar anuncio"}
+              </button>
+            )}
+
             <button
               type="button"
               onClick={onCancel}

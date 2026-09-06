@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getPostById } from "../../../services/postService";
-import { useNotification } from "../../../hooks/useNotification";
-import { getUserFacingErrorMessage } from "../../../services/errorMapper";
+import { getPostById } from "@/features/feed/services/postService";
+import { useNotification } from "@/hooks/useNotification";
+import { getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 import {
+  addModelPostContents,
   createModelPost,
   getActiveCatalogs,
   getModelContent,
+  removeModelPostContent,
   updateModelPost,
-} from "../../../services/modelAdsService";
-import type { Catalog } from "../../../services/flagService";
+} from "@/features/model-ads/services/modelAdsService";
+import type { Catalog } from "@/features/onboarding/services/flagService";
 import type { MyModelPost } from "../types/modelMyPosts";
 import type {
   ModelAdFormErrors,
@@ -16,7 +18,7 @@ import type {
   ModelAdMode,
   ModelContentItem,
   UpdateModelPostPayload,
-} from "../../../types/modelAds";
+} from "@/features/model-ads/types/modelAds";
 
 type LoadedValues = {
   title: string;
@@ -45,6 +47,7 @@ export type UseModelAdFormReturn = {
   catalogs: Catalog[];
   selectedCatalog: Catalog | null;
   contents: ModelContentItem[];
+  postPhotos: ModelContentItem[];
   loadingData: boolean;
   loadError: string;
   title: string;
@@ -59,9 +62,15 @@ export type UseModelAdFormReturn = {
   setCoverPhotoContentId: React.Dispatch<React.SetStateAction<string>>;
   services: string[];
   toggleService: (value: string) => void;
-  serviceInput: string;
-  setServiceInput: React.Dispatch<React.SetStateAction<string>>;
-  handleAddService: () => void;
+  photoPickerOpen: boolean;
+  setPhotoPickerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedPhotoIdsForAdd: string[];
+  togglePhotoSelectionForAdd: (contentId: string) => void;
+  confirmAddPhotos: () => Promise<void>;
+  removePhotoFromPost: (contentId: string) => Promise<void>;
+  photosBusy: boolean;
+  photosError: string;
+  clearPhotosError: () => void;
   submitting: boolean;
   submitError: string;
   submitMessage: string;
@@ -81,6 +90,16 @@ const CREATE_SUCCESS_MESSAGE =
 const UPDATE_SUCCESS_MESSAGE =
   "Los cambios se guardaron y la publicación volvió a revisión.";
 
+const MAX_POST_PHOTOS = 5;
+
+export const MODEL_AD_STATIC_SERVICES = [
+  "VIDEO_LLAMADAS",
+  "CHAT_EROTICO",
+  "SEXTING",
+  "WEBCAM",
+  "VENTA_DE_CONTENIDO",
+] as const;
+
 const normalizeService = (value: string) => value.trim().toUpperCase().replace(/\s+/g, "_");
 
 const areArraysEqual = (left: string[], right: string[]): boolean => {
@@ -95,11 +114,13 @@ const buildInitialValues = (
   mode: ModelAdMode,
   initialPost: MyModelPost | null,
   detail: Awaited<ReturnType<typeof getPostById>> | null,
-  contents: ModelContentItem[]
+  contents: ModelContentItem[],
+  postPhotos: ModelContentItem[]
 ): LoadedValues => {
+  const pool = [...postPhotos, ...contents];
   const detailCoverPhotoId =
-    detail?.coverPhotoUrl && contents.length > 0
-      ? contents.find((content) => content.contentUrl === detail.coverPhotoUrl)?.id || ""
+    detail?.coverPhotoUrl && pool.length > 0
+      ? pool.find((content) => content.contentUrl === detail.coverPhotoUrl)?.id || ""
       : "";
 
   return {
@@ -113,7 +134,9 @@ const buildInitialValues = (
           : "",
     catalogId: detail?.catalogId || initialPost?.catalogId || "",
     coverPhotoContentId: mode === "edit" ? detailCoverPhotoId : "",
-    services: detail?.services || [],
+    services: (detail?.services || [])
+      .map((service) => normalizeService(service))
+      .filter((service) => MODEL_AD_STATIC_SERVICES.includes(service as (typeof MODEL_AD_STATIC_SERVICES)[number])),
   };
 };
 
@@ -127,6 +150,7 @@ export const useModelAdForm = ({
   const { success } = useNotification();
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [contents, setContents] = useState<ModelContentItem[]>([]);
+  const [postPhotos, setPostPhotos] = useState<ModelContentItem[]>([]);
   const [loadingData, setLoadingData] = useState(false);
   const [loadError, setLoadError] = useState("");
 
@@ -136,7 +160,12 @@ export const useModelAdForm = ({
   const [catalogId, setCatalogId] = useState("");
   const [coverPhotoContentId, setCoverPhotoContentId] = useState("");
   const [services, setServices] = useState<string[]>([]);
-  const [serviceInput, setServiceInput] = useState("");
+  const [photoPickerOpen, setPhotoPickerOpen] = useState(false);
+  const [selectedPhotoIdsForAdd, setSelectedPhotoIdsForAdd] = useState<string[]>([]);
+  const [photosBusy, setPhotosBusy] = useState(false);
+  const [loadingProfileContents, setLoadingProfileContents] = useState(false);
+  const [profileContentsLoaded, setProfileContentsLoaded] = useState(false);
+  const [photosError, setPhotosError] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -165,7 +194,11 @@ export const useModelAdForm = ({
     setCatalogId(nextValues.catalogId);
     setCoverPhotoContentId(nextValues.coverPhotoContentId);
     setServices(nextValues.services);
-    setServiceInput("");
+    setSelectedPhotoIdsForAdd([]);
+    setPhotoPickerOpen(false);
+    setProfileContentsLoaded(false);
+    setLoadingProfileContents(false);
+    setPhotosError("");
     setFormErrors(INITIAL_FORM_ERRORS);
   }, []);
 
@@ -178,7 +211,7 @@ export const useModelAdForm = ({
 
     const [catalogsResult, contentsResult, detailResult] = await Promise.allSettled([
       getActiveCatalogs(),
-      getModelContent(),
+      mode === "create" ? getModelContent() : Promise.resolve([]),
       mode === "edit" && postId ? getPostById(postId, { isPublicRequest: false }) : Promise.resolve(null),
     ]);
 
@@ -199,21 +232,29 @@ export const useModelAdForm = ({
     if (contentsResult.status === "fulfilled") {
       loadedContents = contentsResult.value;
       setContents(contentsResult.value);
+      setProfileContentsLoaded(mode === "create");
     } else {
       setContents([]);
       setCoverPhotoContentId("");
       setLoadError("No pudimos cargar tu contenido multimedia. Intenta nuevamente.");
+      setProfileContentsLoaded(false);
     }
 
     if (mode === "edit") {
       const detail = detailResult.status === "fulfilled" ? detailResult.value : null;
-      const nextValues = buildInitialValues(mode, initialPost || null, detail, loadedContents);
+      const loadedPostPhotos = (detail?.modelContents || []).filter(
+        (content): content is ModelContentItem => content.contentType === "IMAGE"
+      );
+      setPostPhotos(loadedPostPhotos);
+
+      const nextValues = buildInitialValues(mode, initialPost || null, detail, loadedContents, loadedPostPhotos);
       applyInitialValues(nextValues);
 
       if (!detail) {
         setLoadError("No fue posible cargar la publicación para editarla.");
       }
     } else {
+      setPostPhotos([]);
       applyInitialValues({
         title: "",
         description: "",
@@ -226,6 +267,30 @@ export const useModelAdForm = ({
 
     setLoadingData(false);
   }, [applyInitialValues, initialPost, mode, postId]);
+
+  const loadProfileContents = useCallback(async () => {
+    if (mode !== "edit") {
+      return;
+    }
+
+    setLoadingProfileContents(true);
+    setPhotosError("");
+
+    try {
+      const multimediaContents = await getModelContent();
+      setContents(multimediaContents);
+      setProfileContentsLoaded(true);
+    } catch (error: unknown) {
+      setPhotosError(
+        getUserFacingErrorMessage(error, {
+          defaultMessage: "No pudimos cargar tus imágenes de perfil.",
+          forbiddenMessage: "No tienes permisos para consultar tu biblioteca de imágenes.",
+        })
+      );
+    } finally {
+      setLoadingProfileContents(false);
+    }
+  }, [mode]);
 
   useEffect(() => {
     if (!enabled) {
@@ -242,10 +307,18 @@ export const useModelAdForm = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (!enabled || mode !== "edit" || !photoPickerOpen || profileContentsLoaded || loadingProfileContents) {
+      return;
+    }
+
+    void loadProfileContents();
+  }, [enabled, loadProfileContents, loadingProfileContents, mode, photoPickerOpen, profileContentsLoaded]);
+
   const toggleService = useCallback((value: string) => {
     const normalizedValue = normalizeService(value);
 
-    if (!normalizedValue) {
+    if (!normalizedValue || !MODEL_AD_STATIC_SERVICES.includes(normalizedValue as (typeof MODEL_AD_STATIC_SERVICES)[number])) {
       return;
     }
 
@@ -258,10 +331,139 @@ export const useModelAdForm = ({
     });
   }, []);
 
-  const handleAddService = useCallback(() => {
-    toggleService(serviceInput);
-    setServiceInput("");
-  }, [serviceInput, toggleService]);
+  const togglePhotoSelectionForAdd = useCallback((contentId: string) => {
+    if (mode !== "edit") {
+      return;
+    }
+
+    setSelectedPhotoIdsForAdd((current) => {
+      if (current.includes(contentId)) {
+        return current.filter((id) => id !== contentId);
+      }
+
+      if (postPhotos.length + current.length >= MAX_POST_PHOTOS) {
+        setPhotosError(`Cada anuncio permite máximo ${MAX_POST_PHOTOS} fotografías.`);
+        return current;
+      }
+
+      return [...current, contentId];
+    });
+  }, [mode, postPhotos.length]);
+
+  const confirmAddPhotos = useCallback(async () => {
+    if (mode !== "edit" || !postId || selectedPhotoIdsForAdd.length === 0) {
+      return;
+    }
+
+    if (postPhotos.length >= MAX_POST_PHOTOS) {
+      setPhotosError(`Este anuncio ya alcanzó el máximo de ${MAX_POST_PHOTOS} fotografías.`);
+      return;
+    }
+
+    const availableSlots = MAX_POST_PHOTOS - postPhotos.length;
+    const contentIdsToAdd = selectedPhotoIdsForAdd.slice(0, availableSlots);
+
+    if (contentIdsToAdd.length === 0) {
+      setPhotosError(`Solo puedes agregar hasta ${MAX_POST_PHOTOS} fotografías por anuncio.`);
+      return;
+    }
+
+    setPhotosBusy(true);
+    setPhotosError("");
+
+    try {
+      const addResult = await addModelPostContents(postId, contentIdsToAdd);
+      const successfulIds = addResult.results
+        .filter((item) => item.status === "SUCCESS" && item.contentId)
+        .map((item) => item.contentId);
+
+      if (successfulIds.length === 0) {
+        const firstError = addResult.results.find((item) => item.status !== "SUCCESS")?.message;
+        setPhotosError(firstError || "No fue posible asociar las imágenes al anuncio.");
+        return;
+      }
+
+      const selectedItems = contents.filter((content) => successfulIds.includes(content.id));
+      setPostPhotos((current) => {
+        const knownIds = new Set(current.map((item) => item.id));
+        const next = [...current];
+
+        selectedItems.forEach((item) => {
+          if (!knownIds.has(item.id)) {
+            next.push(item);
+          }
+        });
+
+        return next;
+      });
+
+      if (!coverPhotoContentId && selectedItems.length > 0) {
+        setCoverPhotoContentId(selectedItems[0].id);
+      }
+
+      setSelectedPhotoIdsForAdd([]);
+      setPhotoPickerOpen(false);
+
+      const failedCount = addResult.summary.failureCount;
+      if (failedCount > 0) {
+        const firstFailure = addResult.results.find((item) => item.status !== "SUCCESS")?.message;
+        setPhotosError(
+          firstFailure ||
+            `Se agregaron ${addResult.summary.successCount} imágenes y ${failedCount} no pudieron asociarse.`
+        );
+      } else if (selectedPhotoIdsForAdd.length > contentIdsToAdd.length) {
+        setPhotosError(`Solo se agregaron ${contentIdsToAdd.length} imágenes por el límite de ${MAX_POST_PHOTOS} por anuncio.`);
+      }
+    } catch (error: unknown) {
+      setPhotosError(
+        getUserFacingErrorMessage(error, {
+          defaultMessage: "No pudimos agregar las fotografías al anuncio.",
+          badRequestMessage: "La selección de imágenes no es válida para este anuncio.",
+          forbiddenMessage: "No tienes permisos para modificar este anuncio.",
+          notFoundMessage: "No encontramos el anuncio o alguna imagen seleccionada.",
+        })
+      );
+    } finally {
+      setPhotosBusy(false);
+    }
+  }, [contents, coverPhotoContentId, mode, postId, postPhotos.length, selectedPhotoIdsForAdd]);
+
+  const removePhotoFromPost = useCallback(
+    async (contentId: string) => {
+      if (mode !== "edit" || !postId) {
+        return;
+      }
+
+      setPhotosBusy(true);
+      setPhotosError("");
+
+      try {
+        await removeModelPostContent(postId, contentId);
+        setPostPhotos((current) => {
+          const next = current.filter((content) => content.id !== contentId);
+          if (coverPhotoContentId === contentId) {
+            setCoverPhotoContentId(next[0]?.id || "");
+          }
+          return next;
+        });
+      } catch (error: unknown) {
+        setPhotosError(
+          getUserFacingErrorMessage(error, {
+            defaultMessage: "No pudimos eliminar la fotografía del anuncio.",
+            forbiddenMessage: "No tienes permisos para modificar este anuncio.",
+            notFoundMessage: "La fotografía ya no está asociada al anuncio.",
+          })
+        );
+      } finally {
+        setPhotosBusy(false);
+      }
+    },
+    [coverPhotoContentId, mode, postId]
+  );
+
+  const clearPhotosError = useCallback(() => {
+    setPhotosError("");
+  }, []);
 
   const validateForm = useCallback((): boolean => {
     const nextErrors: ModelAdFormErrors = {};
@@ -379,6 +581,7 @@ export const useModelAdForm = ({
           title: values.title,
           description: values.description,
           coverPhotoContentId: values.coverPhotoContentId,
+          contentIds: [values.coverPhotoContentId],
           catalogId: values.catalogId,
           priceAmount: Number(values.priceAmount),
           services: values.services,
@@ -480,6 +683,7 @@ export const useModelAdForm = ({
     catalogs: sortedCatalogs,
     selectedCatalog,
     contents,
+    postPhotos,
     loadingData,
     loadError,
     title,
@@ -494,9 +698,15 @@ export const useModelAdForm = ({
     setCoverPhotoContentId,
     services,
     toggleService,
-    serviceInput,
-    setServiceInput,
-    handleAddService,
+    photoPickerOpen,
+    setPhotoPickerOpen,
+    selectedPhotoIdsForAdd,
+    togglePhotoSelectionForAdd,
+    confirmAddPhotos,
+    removePhotoFromPost,
+    photosBusy,
+    photosError,
+    clearPhotosError,
     submitting,
     submitError,
     submitMessage,

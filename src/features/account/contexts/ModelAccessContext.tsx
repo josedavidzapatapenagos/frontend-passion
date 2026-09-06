@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { getModelAccountMeApi } from "../../../services/accountSettingsService";
-import { getModelProfileMeOrNull, type ModelProfile } from "../../../services/modelProfileService";
-import { readAuthState } from "../../../services/navigationFlow";
-import { getIdentityVerificationStatus } from "../../../services/identityVerificationService";
+import { getModelAccountMeApi } from "@/features/account/services/accountSettingsService";
+import { getModelProfileMeOrNull, type ModelProfile } from "@/features/model-profile/services/modelProfileService";
+import { readAuthState } from "@/features/onboarding/services/navigationFlow";
+import { getIdentityVerificationStatus } from "@/features/identity-verification/services/identityVerificationService";
 
 type ModelAccessState = {
   accountApproved: boolean;

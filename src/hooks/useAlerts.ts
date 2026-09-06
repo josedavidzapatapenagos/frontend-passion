@@ -1,4 +1,4 @@
-import type { AlertTone } from "../components/alertTone";
+import type { AlertTone } from "@/components/ui/AlertTone";
 
 type AlertConfig = {
   title: string;

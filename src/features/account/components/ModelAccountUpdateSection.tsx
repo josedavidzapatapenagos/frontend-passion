@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import type { ModelAccountMe } from "../../../services/accountSettingsService";
-import { InfoCard } from "../../../components/InfoCard";
-import { SkeletonLoader } from "../../../components/SkeletonLoader";
-import { StatusBadge } from "../../../components/StatusBadge";
-import { useNotification } from "../../../hooks/useNotification";
+import type { ModelAccountMe } from "@/features/account/services/accountSettingsService";
+import { InfoCard } from "@/components/common/InfoCard";
+import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { useNotification } from "@/hooks/useNotification";
 
 type Props = {
   profile: ModelAccountMe | null;

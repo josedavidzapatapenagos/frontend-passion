@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import {
   getModelAccountMeApi,
   type ModelAccountMe,
-} from "../../../services/accountSettingsService";
-import { getUserFacingErrorMessage } from "../../../services/errorMapper";
+} from "@/features/account/services/accountSettingsService";
+import { getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 
 export const useModelAccountUpdate = (isModel: boolean) => {
   const [profile, setProfile] = useState<ModelAccountMe | null>(null);

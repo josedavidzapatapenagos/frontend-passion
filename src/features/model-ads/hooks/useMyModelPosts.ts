@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNotification } from "../../../hooks/useNotification";
-import { getUserFacingErrorMessage } from "../../../services/errorMapper";
+import { useNotification } from "@/hooks/useNotification";
+import { getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 import {
   activateMyModelPost,
   deactivateMyModelPost,
   getMyModelPosts,
-} from "../services/modelMyPostsService";
+} from "@/features/model-ads/services/modelMyPostsService";
 import type {
   ModelPostStatusAction,
   MyModelPost,
@@ -126,6 +126,51 @@ export const useMyModelPosts = (enabled: boolean) => {
     }
   }, [confirmAction, success]);
 
+  const changeStatusDirect = useCallback(
+    async (postId: string, action: ModelPostStatusAction): Promise<boolean> => {
+      setPendingPostId(postId);
+      setMutationFeedback(null);
+
+      try {
+        if (action === "activate") {
+          await activateMyModelPost(postId);
+        } else {
+          await deactivateMyModelPost(postId);
+        }
+
+        setPosts((currentPosts) =>
+          currentPosts.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  status: getNextStatus(action),
+                }
+              : post
+          )
+        );
+
+        success({
+          title: action === "activate" ? "Publicación activada" : "Publicación desactivada",
+          description:
+            action === "activate"
+              ? "La publicación volvió a estar visible para los usuarios."
+              : "La publicación quedó como inactiva y no es visible para los usuarios.",
+        });
+
+        return true;
+      } catch (error: unknown) {
+        setMutationFeedback({
+          kind: "error",
+          message: getMutationErrorMessage(action, error),
+        });
+        return false;
+      } finally {
+        setPendingPostId(null);
+      }
+    },
+    [success]
+  );
+
   const updatePost = useCallback((postId: string, updates: Partial<MyModelPost>) => {
     setPosts((currentPosts) =>
       currentPosts.map((post) =>
@@ -164,6 +209,7 @@ export const useMyModelPosts = (enabled: boolean) => {
     requestStatusChange,
     cancelStatusChange,
     confirmStatusChange,
+    changeStatusDirect,
     updatePost,
   };
 };

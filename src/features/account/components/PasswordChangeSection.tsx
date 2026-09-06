@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import type { FormEvent } from "react";
-import { InfoCard } from "../../../components/InfoCard";
-import { useNotification } from "../../../hooks/useNotification";
+import { InfoCard } from "@/components/common/InfoCard";
+import { useNotification } from "@/hooks/useNotification";
 
 type Props = {
   currentPassword: string;

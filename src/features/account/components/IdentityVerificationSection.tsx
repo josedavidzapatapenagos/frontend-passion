@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { InfoCard } from "../../../components/InfoCard";
-import { StatusBadge } from "../../../components/StatusBadge";
-import { useNotification } from "../../../hooks/useNotification";
-import type { IdentityVerificationStatus } from "../../../services/identityVerificationService";
-import { DOCUMENT_TYPE_OPTIONS } from "../hooks/useIdentityVerification";
+import { InfoCard } from "@/components/common/InfoCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { useNotification } from "@/hooks/useNotification";
+import type { IdentityVerificationStatus } from "@/features/identity-verification/services/identityVerificationService";
+import { DOCUMENT_TYPE_OPTIONS } from "@/features/account/hooks/useIdentityVerification";
 
 type Props = {
   status: IdentityVerificationStatus | null;

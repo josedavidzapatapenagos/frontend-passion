@@ -3,12 +3,12 @@ import {
   getIdentityVerificationStatus,
   submitIdentityVerification,
   type IdentityVerificationStatus,
-} from "../../../services/identityVerificationService";
+} from "@/features/identity-verification/services/identityVerificationService";
 import {
   canSubmitIdentityVerification,
   getVerificationLockReason,
 } from "../domain/identityVerificationPolicy";
-import { getBackendErrorMessage, getUserFacingErrorMessage } from "../../../services/errorMapper";
+import { getBackendErrorMessage, getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 
 export const DOCUMENT_TYPE_OPTIONS = [
   { value: "DNI", label: "DNI" },

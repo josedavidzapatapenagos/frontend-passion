@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
-import type { AlertTone } from "../components/alertTone";
+import type { AlertTone } from "@/components/ui/AlertTone";
 
 export type ConfirmDialogOptions = {
   title: string;

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { updateModelPassword } from "../../../services/accountSettingsService";
-import { getBackendErrorMessage, getUserFacingErrorMessage } from "../../../services/errorMapper";
+import { updateModelPassword } from "@/features/account/services/accountSettingsService";
+import { getBackendErrorMessage, getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 
 export const usePasswordChange = () => {
   const [currentPassword, setCurrentPassword] = useState("");

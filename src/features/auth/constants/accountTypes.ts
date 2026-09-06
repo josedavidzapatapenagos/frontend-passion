@@ -1,5 +1,6 @@
 export const ALLOWED_ACCOUNT_TYPES = [
   "USER",
+  "CLIENT",
   "MODEL",
   "ADMIN",
   "SUPER_ADMIN",
@@ -29,7 +30,8 @@ export const getAccountTypeFromAuthPayload = (
   }
 
   const candidate = (payload as Record<string, unknown>).accountType;
-  return toAllowedAccountType(candidate);
+  const snakeCaseCandidate = (payload as Record<string, unknown>).account_type;
+  return toAllowedAccountType(candidate ?? snakeCaseCandidate);
 };
 
 export const getAuthTokenFromAuthPayload = (
@@ -42,6 +44,7 @@ export const getAuthTokenFromAuthPayload = (
   const record = payload as Record<string, unknown>;
   const token =
     (record.accessToken as string | undefined) ||
+    (record.access_token as string | undefined) ||
     (record.token as string | undefined);
   return typeof token === "string" && token.trim().length > 0
     ? token
@@ -58,6 +61,7 @@ export const getAccountFullNameFromAuthPayload = (
   const record = payload as Record<string, unknown>;
   const fullName =
     (record.accountFullName as string | undefined) ||
+    (record.account_full_name as string | undefined) ||
     (record.fullName as string | undefined);
   return typeof fullName === "string" && fullName.trim().length > 0
     ? fullName
