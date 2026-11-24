@@ -69,7 +69,7 @@ export const RegisterPage = ({ variant = "MODEL" }: RegisterPageProps) => {
   };
 
   return (
-    <div className="min-h-screen vp-page-bg flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-dvh vp-page-bg flex items-center justify-center px-4 py-8 relative overflow-hidden">
 
       {/* Glow fondo */}
       <div className="absolute w-96 h-96 bg-[#FD0083]/20 blur-[120px] rounded-full -top-20 -left-20" />
@@ -84,13 +84,13 @@ export const RegisterPage = ({ variant = "MODEL" }: RegisterPageProps) => {
           backdrop-blur-xl
           border vp-border
           rounded-[2.5rem]
-          p-10
+          p-5 sm:p-10
           shadow-[0_30px_80px_rgba(0,0,0,0.35)]
         "
       >
         <div className="text-center mb-10">
 
-          <h1 className="text-5xl font-black italic text-[#FD0083] tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-black italic text-[#FD0083] tracking-tight">
             Virtual Passion
           </h1>
 

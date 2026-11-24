@@ -86,9 +86,9 @@ const AccountManagementPage = ({ kind }: { kind: "admins" | "models" }) => {
   };
 
   return (
-    <div className="min-h-screen p-6 md:p-10 vp-text-primary">
+    <div className="min-h-dvh p-4 sm:p-6 lg:p-10 vp-text-primary">
       <div className="mx-auto max-w-6xl space-y-6">
-        <section className="rounded-3xl border vp-border vp-surface p-6 md:p-8">
+        <section className="min-w-0 rounded-3xl border vp-border vp-surface p-4 sm:p-6 lg:p-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h2 className="text-2xl font-black text-[#FD0083] md:text-3xl">{isModels ? "Modelos" : "Administradores"}</h2>
@@ -134,7 +134,7 @@ const AccountManagementPage = ({ kind }: { kind: "admins" | "models" }) => {
             </p>
           ) : (
             <div className="mt-6 overflow-x-auto rounded-2xl border vp-border">
-              <table className="w-full text-left text-sm">
+              <table className="vp-account-table w-full text-left text-sm">
                 <caption className="sr-only">{isModels ? "Cuentas de modelos disponibles" : "Cuentas de administrador disponibles"}</caption>
                 <thead className="vp-surface-soft">
                   <tr>
@@ -149,16 +149,16 @@ const AccountManagementPage = ({ kind }: { kind: "admins" | "models" }) => {
                   {accounts.map((account) => (
                     <tr key={account.id} className="border-t vp-border">
                       {isModels && (
-                        <td className="p-4 font-semibold">
+                        <td data-label="Nombre" className="p-4 font-semibold">
                           {"name" in account ? `${account.name} ${account.lastname}`.trim() : ""}
                         </td>
                       )}
-                      <td className="p-4 font-semibold">{account.email}</td>
-                      <td className="p-4"><StatusBadge status={account.status} /></td>
-                      <td className="whitespace-nowrap p-4">
+                      <td data-label="Correo electrónico" className="p-4 font-semibold">{account.email}</td>
+                      <td data-label="Estado" className="p-4"><StatusBadge status={account.status} /></td>
+                      <td data-label="Fecha de creación" className="whitespace-nowrap p-4">
                         {new Date(account.created_at).toLocaleString("es-CO")}
                       </td>
-                      <td className="p-4">
+                      <td data-label="Acciones" className="p-4">
                         <div className="flex flex-wrap gap-2">
                           {!isModels && <Button
                             variant="ghost"

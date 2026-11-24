@@ -35,18 +35,18 @@ export const ConfirmationDialog = ({
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/55 p-4">
-      <div className="w-full max-w-lg rounded-[28px] border border-slate-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#013440]">
+      <div role="dialog" aria-modal="true" aria-labelledby="confirmation-title" className="max-h-[calc(100dvh-2rem)] overflow-y-auto break-words w-full max-w-lg rounded-[28px] border border-slate-200 bg-white p-4 sm:p-6 shadow-2xl dark:border-white/10 dark:bg-[#013440]">
         <div className="flex items-start gap-3">
           <div className={`rounded-2xl p-2 ${classes.container}`}>
             <AppIcon name={iconName} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-base font-black text-slate-900 dark:text-white">{title}</p>
+            <p id="confirmation-title" className="text-base font-black text-slate-900 dark:text-white">{title}</p>
             {description ? <div className="mt-2 text-sm text-slate-700 dark:text-white/75">{description}</div> : null}
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}

@@ -155,8 +155,8 @@ export const CreateAdminAccountPage = () => {
   );
 
   return (
-    <div className="min-h-screen p-6 md:p-10 vp-text-primary">
-      <div className="mx-auto max-w-5xl rounded-3xl border vp-border vp-surface p-6 md:p-8">
+    <div className="min-h-dvh p-4 sm:p-6 lg:p-10 vp-text-primary">
+      <div className="mx-auto max-w-5xl rounded-3xl border vp-border vp-surface p-4 sm:p-6 lg:p-8">
         <div>
           <h2 className="text-2xl font-black text-[#FD0083] md:text-3xl">Crear administrador</h2>
           <p className="mt-2 vp-text-secondary">

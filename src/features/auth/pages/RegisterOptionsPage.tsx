@@ -4,7 +4,7 @@ export const RegisterOptionsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen vp-page-bg px-6 py-16">
+    <div className="min-h-dvh vp-page-bg px-4 sm:px-6 py-8 sm:py-16">
 
       <div className="max-w-6xl mx-auto">
 
@@ -12,11 +12,11 @@ export const RegisterOptionsPage = () => {
 
         <div className="text-center mb-14">
 
-          <h1 className="text-5xl md:text-6xl font-black vp-text-primary">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black vp-text-primary">
             Bienvenido a
           </h1>
 
-          <h2 className="text-6xl md:text-7xl font-black italic text-[#FD0083] mt-2">
+          <h2 className="text-4xl sm:text-6xl md:text-7xl font-black italic text-[#FD0083] mt-2">
             Virtual Passion
           </h2>
 
@@ -38,7 +38,7 @@ export const RegisterOptionsPage = () => {
               vp-surface
               border border-[#FD0083]/20
               rounded-[2rem]
-              p-8
+              p-5 sm:p-8
               shadow-2xl
               hover:scale-105
               hover:border-[#FD0083]
@@ -119,7 +119,7 @@ export const RegisterOptionsPage = () => {
               vp-surface
               border border-[#00BCD4]/20
               rounded-[2rem]
-              p-8
+              p-5 sm:p-8
               shadow-2xl
               hover:scale-105
               hover:border-[#00BCD4]

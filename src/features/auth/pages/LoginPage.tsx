@@ -329,11 +329,11 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen vp-page-bg flex items-center justify-center px-4">
+    <div className="min-h-dvh vp-page-bg flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="vp-surface border vp-border rounded-[2rem] p-8 shadow-2xl">
+        <div className="vp-surface border vp-border rounded-[2rem] p-5 sm:p-8 shadow-2xl">
 
-          <h1 className="text-[#FD0083] text-5xl font-black italic text-center mb-2">
+          <h1 className="text-[#FD0083] text-3xl sm:text-5xl font-black italic text-center mb-2">
             Virtual Passion
           </h1>
 

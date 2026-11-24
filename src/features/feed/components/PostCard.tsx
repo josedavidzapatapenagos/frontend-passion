@@ -69,9 +69,9 @@ export const PostCard = ({ post, onSelect }: PostCardProps) => {
   return (
     <div 
       onClick={() => onSelect(post.id)}
-      className="relative z-10 flex items-center w-full bg-gradient-to-br from-white to-slate-50 dark:from-[#012a33] dark:to-[#012a33] rounded-[3rem] p-6 cursor-pointer shadow-[0_20px_50px_rgba(15,23,42,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_24px_70px_rgba(15,23,42,0.14)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] hover:scale-[1.01] transition-all duration-300 group border border-slate-200 dark:border-white/5"
+      className="relative z-10 flex flex-col sm:flex-row gap-4 sm:gap-6 items-center w-full bg-gradient-to-br from-white to-slate-50 dark:from-[#012a33] dark:to-[#012a33] rounded-3xl sm:rounded-[3rem] p-4 sm:p-6 cursor-pointer shadow-[0_20px_50px_rgba(15,23,42,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_24px_70px_rgba(15,23,42,0.14)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] hover:scale-[1.01] transition-all duration-300 group border border-slate-200 dark:border-white/5"
     >
-      <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-[6px] border-[#FD0083] overflow-hidden flex-shrink-0 shadow-md group-hover:border-[#00BCD4] transition-colors duration-500">
+      <div className="w-24 h-24 sm:w-32 sm:h-32 xl:w-40 xl:h-40 rounded-full border-[6px] border-[#FD0083] overflow-hidden flex-shrink-0 shadow-md group-hover:border-[#00BCD4] transition-colors duration-500">
         {isPrimaryVideo ? (
           <video
             src={mediaSrc}
@@ -90,9 +90,9 @@ export const PostCard = ({ post, onSelect }: PostCardProps) => {
         )}
       </div>
       
-      <div className="ml-8 text-left flex-1">
-        <div className="flex items-center gap-4 mb-2">
-          <h3 className="text-[#00BCD4] font-black text-3xl md:text-4xl uppercase italic tracking-tighter leading-none">
+      <div className="min-w-0 w-full text-left flex-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
+          <h3 className="min-w-0 break-words text-[#00BCD4] font-black text-2xl sm:text-3xl xl:text-4xl uppercase italic tracking-tighter leading-none">
             {modelName}
           </h3>
           {post.hasPremium && (
@@ -100,7 +100,7 @@ export const PostCard = ({ post, onSelect }: PostCardProps) => {
               PREMIUM
             </span>
           )}
-          <span className="text-slate-900 dark:text-white font-black text-xl ml-auto bg-slate-100 dark:bg-white/5 px-5 py-2 rounded-2xl transition-colors border border-slate-200 dark:border-white/10">
+          <span className="text-slate-900 dark:text-white font-black text-lg sm:text-xl sm:ml-auto bg-slate-100 dark:bg-white/5 px-3 sm:px-5 py-2 rounded-2xl transition-colors border border-slate-200 dark:border-white/10">
             ${post.price.amount} <span className="text-xs opacity-60">{post.price.currency}</span>
           </span>
         </div>

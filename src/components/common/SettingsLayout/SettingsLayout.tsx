@@ -4,7 +4,7 @@ import { SettingsTabs } from "./SettingsTabs";
 import type { SettingsLayoutProps, SettingsTabId } from "./types";
 
 const DEFAULT_PANEL_CLASSES =
-  "max-w-3xl mx-auto rounded-3xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-white to-slate-50 dark:from-[#012a33] dark:to-[#012a33] p-6 md:p-8 text-slate-900 dark:text-white shadow-xl shadow-slate-200/70 dark:shadow-black/20";
+  "min-w-0 max-w-3xl mx-auto rounded-3xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-white to-slate-50 dark:from-[#012a33] dark:to-[#012a33] p-4 sm:p-6 lg:p-8 text-slate-900 dark:text-white shadow-xl shadow-slate-200/70 dark:shadow-black/20";
 
 const DEFAULT_CONTENT_CLASSES = "mt-6";
 

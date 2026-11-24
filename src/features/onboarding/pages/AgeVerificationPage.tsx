@@ -28,10 +28,10 @@ export const AgeVerificationPage = () => {
   };
 
   return (
-    <div className="min-h-screen vp-page-bg flex items-center justify-center px-4">
+    <div className="min-h-dvh vp-page-bg flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-lg">
-        <div className="vp-surface border vp-border rounded-[2rem] p-10 shadow-2xl">
-          <h1 className="text-[#FD0083] text-4xl font-black italic text-center mb-4">
+        <div className="vp-surface border vp-border rounded-[2rem] p-5 sm:p-10 shadow-2xl">
+          <h1 className="text-[#FD0083] text-3xl sm:text-4xl font-black italic text-center mb-4">
             Verificación de Edad
           </h1>
 
@@ -39,7 +39,7 @@ export const AgeVerificationPage = () => {
             Debes confirmar que eres mayor de edad para continuar.
           </p>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleAdult}
               className="

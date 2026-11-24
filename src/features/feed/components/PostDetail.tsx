@@ -93,9 +93,9 @@ export const PostDetailView = ({
   }
 
   return (
-    <div className="px-16 w-full text-left bg-slate-50 dark:bg-[#012a33] text-slate-900 dark:text-white pb-12 transition-colors">
-      <div className="flex justify-between items-start mb-10 gap-4">
-        <div className="space-y-8">
+    <div className="px-4 sm:px-6 xl:px-16 w-full text-left bg-slate-50 dark:bg-[#012a33] text-slate-900 dark:text-white pb-6 sm:pb-12 transition-colors">
+      <div className="flex flex-col xl:flex-row justify-between items-start mb-6 sm:mb-10 gap-6">
+        <div className="min-w-0 space-y-8">
           {/* Sección de Servicios */}
           <div>
             <h4 className="text-[#012a33] dark:text-[#00BCD4] font-black text-xl mb-4 uppercase italic transition-colors">Servicios Virtuales</h4>
@@ -109,14 +109,14 @@ export const PostDetailView = ({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-4">
+        <div className="flex w-full xl:w-auto shrink-0 flex-col items-stretch xl:items-end gap-4">
           {/* Botón LLAMAME estilo WhatsApp oficial */}
           {normalizedWhatsapp ? (
             <a 
               href={`https://wa.me/${normalizedWhatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#25D366] hover:bg-[#20ba5a] hover:scale-105 transition-all text-white px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_15px_30px_rgba(37,211,102,0.4)]"
+              className="bg-[#25D366] hover:bg-[#20ba5a] transition-all text-white px-4 sm:px-8 py-4 rounded-full font-black text-lg sm:text-2xl flex justify-center items-center gap-3 shadow-[0_15px_30px_rgba(37,211,102,0.4)]"
             >
               <img 
                 src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
@@ -150,7 +150,7 @@ export const PostDetailView = ({
       </div>
 
       {/* Galería de fotos GIGANTES alineada a la izquierda */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
         {(modelContents.length > 0
           ? modelContents
           : [{

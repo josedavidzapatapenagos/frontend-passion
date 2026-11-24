@@ -21,6 +21,32 @@ Para una demo con backend local:
 4. Volver a desplegar el frontend después de cambiar la variable.
 5. Mantener el PC, el backend y el túnel activos mientras se usa la demo.
 
+Despues de reiniciar el PC, iniciar tambien la base de datos antes del backend.
+Para abrir un tunel temporal en una terminal de PowerShell:
+
+```powershell
+& 'C:\Program Files (x86)\cloudflared\cloudflared.exe' tunnel --url http://127.0.0.1:8080 --no-autoupdate
+```
+
+Mantener esa terminal abierta. Cada nuevo tunel temporal puede cambiar de URL:
+actualizar `VITE_API_BASE_URL` y volver a desplegar. La URL del frontend no cambia.
+Configurar CORS del backend para permitir el dominio HTTPS del frontend; no usar
+el proxy de desarrollo de Vite como conexion del sitio desplegado.
+
+## Diseno adaptable
+
+En celulares y tablets de menos de 1024 px, el menu se abre con el boton
+de navegacion y se cierra al seleccionar una ruta. En pantallas mayores se conserva
+la barra lateral plegable. El feed, los formularios y los dialogos ajustan sus
+espacios; los listados de cuentas muestran filas apiladas con etiquetas en celulares.
+
+Las pruebas `tests/e2e/responsive.spec.ts` revisan desbordamiento horizontal,
+controles y navegacion en 320, 390, 768, 1024 y 1440 px, con datos simulados:
+login, registro, cuenta, creacion de administradores, feed expandido y acciones de
+cuentas. Ejecutar `npx playwright test responsive.spec.ts admin-navbar.spec.ts`.
+Estas pruebas no sustituyen la validacion de autenticacion y pagos contra el
+backend real ni garantizan compatibilidad con todos los navegadores.
+
 ## Modelos del superadministrador
 
 La opcion Modelos del SUPER_ADMIN (`/admin/models`) lista cuentas MODEL usando

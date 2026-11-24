@@ -57,6 +57,11 @@ export const Navbar = () => {
   const location = useLocation();
   const [authSnapshot, setAuthSnapshot] = useState<AuthSnapshot>(readAuthSnapshot());
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mobileMenuPath, setMobileMenuPath] = useState<string | null>(null);
+  const isMobileMenuOpen = mobileMenuPath === location.pathname;
+  if (mobileMenuPath !== null && mobileMenuPath !== location.pathname) {
+    setMobileMenuPath(null);
+  }
   const [isLargeScreen, setIsLargeScreen] = useState(
     () => window.matchMedia("(min-width: 1024px)").matches
   );
@@ -104,15 +109,11 @@ export const Navbar = () => {
 
     const handleScreenChange = (event: MediaQueryListEvent) => {
       setIsLargeScreen(event.matches);
+      setMobileMenuPath(null);
       if (!event.matches) {
         setIsCollapsed(false);
       }
     };
-
-    setIsLargeScreen(mediaQuery.matches);
-    if (!mediaQuery.matches) {
-      setIsCollapsed(false);
-    }
 
     mediaQuery.addEventListener("change", handleScreenChange);
 
@@ -216,24 +217,25 @@ export const Navbar = () => {
 
   const handleNavigate = (path: string) => {
     navigate(path);
+    setMobileMenuPath(null);
     if (isLargeScreen) {
       setIsCollapsed(true);
     }
   };
 
-  const showExpandedContent = !isLargeScreen || !isCollapsed;
+  const showExpandedContent = isLargeScreen ? !isCollapsed : isMobileMenuOpen;
 
   return (
     <aside
-      className={`w-full min-h-0 border-r border-slate-200 bg-white/90 text-slate-900 backdrop-blur-md transition-all duration-300 dark:border-white/10 dark:bg-[#012a33]/95 dark:text-white md:min-h-screen ${
-        isLargeScreen && isCollapsed ? "md:w-20" : "md:w-72"
+      className={`w-full shrink-0 min-h-0 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white/90 text-slate-900 backdrop-blur-md transition-all duration-300 dark:border-white/10 dark:bg-[#012a33]/95 dark:text-white lg:min-h-screen ${
+        isLargeScreen && isCollapsed ? "lg:w-20" : "lg:w-72"
       }`}
     >
-      <div className="flex h-full flex-col p-4 md:p-6">
-        <div className="flex items-center justify-between gap-3">
+      <div className={`flex h-full flex-col p-4 ${isLargeScreen && isCollapsed ? "lg:p-4" : "lg:p-6"}`}>
+        <div className={`flex items-center justify-between gap-3 ${isLargeScreen && isCollapsed ? "lg:flex-col" : ""}`}>
           <h1
-            className={`cursor-pointer font-black italic text-[#FD0083] transition-all duration-300 ${
-              isLargeScreen && isCollapsed ? "text-xl md:text-2xl" : "text-3xl"
+            className={`min-w-0 cursor-pointer font-black italic text-[#FD0083] transition-all duration-300 ${
+              isLargeScreen && isCollapsed ? "text-xl" : "text-2xl sm:text-3xl lg:text-2xl"
             }`}
             onClick={() => navigate("/feed")}
           >
@@ -242,8 +244,21 @@ export const Navbar = () => {
 
           <button
             type="button"
+            onClick={() => setMobileMenuPath(isMobileMenuOpen ? null : location.pathname)}
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 lg:hidden"
+            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="navbar-content"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" aria-hidden="true">
+              {isMobileMenuOpen ? <path d="m6 6 12 12M6 18 18 6" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
+            </svg>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setIsCollapsed((prev) => !prev)}
-            className="hidden h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-700 transition-all hover:bg-slate-100 dark:border-white/10 dark:text-white dark:hover:bg-white/10 lg:inline-flex"
+            className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-700 transition-all hover:bg-slate-100 dark:border-white/10 dark:text-white dark:hover:bg-white/10 lg:inline-flex"
             aria-label={isCollapsed ? "Desplegar menú" : "Recoger menú"}
             aria-expanded={!isCollapsed}
           >
@@ -260,7 +275,7 @@ export const Navbar = () => {
         </div>
 
         {showExpandedContent && (
-          <>
+          <div id="navbar-content">
             <div className="mt-4 flex items-center justify-between gap-3">
               <ThemeSwitcher />
               {isLogged && (
@@ -353,7 +368,7 @@ export const Navbar = () => {
               </nav>
             )}
 
-          </>
+          </div>
         )}
       </div>
     </aside>

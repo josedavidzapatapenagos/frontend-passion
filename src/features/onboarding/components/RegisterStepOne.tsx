@@ -41,10 +41,10 @@ export const RegisterStepOne = ({ onSelectionComplete }: RegisterStepOneProps) =
   );
 
   return (
-    <div className="min-h-screen w-full p-8 flex flex-col items-center justify-center font-sans vp-page-bg">
+    <div className="min-h-dvh w-full px-4 py-8 sm:p-8 flex flex-col items-center justify-center font-sans vp-page-bg">
       
       <header className="mb-12 text-center animate-in fade-in slide-in-from-top-4 duration-700">
-        <h1 className="vp-text-primary text-4xl md:text-5xl font-black italic uppercase tracking-tighter">
+        <h1 className="vp-text-primary text-3xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tighter">
           Selecciona tu <span className="text-[#FD0083] drop-shadow-[0_0_15px_rgba(253,0,131,0.5)]">Región</span>
         </h1>
         <p className="vp-text-muted mt-3 uppercase tracking-[0.4em] text-[10px] font-bold">
@@ -57,7 +57,7 @@ export const RegisterStepOne = ({ onSelectionComplete }: RegisterStepOneProps) =
           <button
             key={country.id}
             onClick={() => setRegionId(country.id)}
-            className={`group relative flex flex-col items-center p-10 rounded-[2.5rem] border-2 transition-all duration-500 ${
+            className={`group relative flex flex-col items-center p-6 sm:p-10 rounded-[2.5rem] border-2 transition-all duration-500 ${
               regionId === country.id 
                 ? 'vp-surface border-[#FD0083] shadow-[0_0_40px_rgba(253,0,131,0.2)] scale-[1.02]' 
                 : 'vp-surface-soft border-slate-300 dark:border-white/5 hover:border-slate-400 dark:hover:border-white/20 hover:bg-[var(--vp-surface)]'
@@ -103,7 +103,7 @@ export const RegisterStepOne = ({ onSelectionComplete }: RegisterStepOneProps) =
         ))}
       </div>
 
-      <div className="mt-16 w-full max-w-xs animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <div className="mt-8 sm:mt-16 w-full max-w-xs animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <button 
           disabled={!regionId}
           onClick={handleConfirmar}

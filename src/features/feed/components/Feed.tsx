@@ -100,7 +100,7 @@ export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 mt-12 space-y-10">
+    <div className="min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-10">
       <PremiumStatesCarousel
         catalogId={catalogId}
         onSelectPost={handleSelectPremiumState}
@@ -115,7 +115,7 @@ export const Feed = ({ catalogId, onPostClick, viewingPostId }: FeedProps) => {
           
 
           {viewingPostId === post.id && (
-            <div className="w-full bg-slate-50 dark:bg-[#012a33] rounded-b-[5rem] -mt-16 pt-24 pb-12 shadow-2xl z-0 animate-in fade-in slide-in-from-top-4 duration-500 border border-slate-200 dark:border-white/10 border-t-0 transition-colors">
+            <div className="w-full bg-slate-50 dark:bg-[#012a33] rounded-b-3xl sm:rounded-b-[5rem] -mt-8 pt-12 sm:-mt-16 sm:pt-24 pb-6 sm:pb-12 shadow-2xl z-0 animate-in fade-in slide-in-from-top-4 duration-500 border border-slate-200 dark:border-white/10 border-t-0 transition-colors">
                <PostDetailView
                  postId={post.id}
                  fallbackPost={post}

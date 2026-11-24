@@ -87,7 +87,6 @@ html, body, #root {
 body {
   background-color: var(--vp-page-bg);
   color: var(--vp-text-primary);
-  overflow-x: hidden;
   transition: background-color 0.4s ease, color 0.4s ease;
   font-family: system-ui, -apple-system, sans-serif;
 }
@@ -125,6 +124,42 @@ span {
 .vp-main-layout {
   background-color: var(--vp-main-bg-light);
   transition: background-color 0.35s ease;
+}
+
+.vp-main-layout main {
+  overflow-wrap: anywhere;
+}
+
+.vp-main-layout :where(input, select, textarea) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 639px) {
+  .vp-account-table,
+  .vp-account-table tbody,
+  .vp-account-table tr,
+  .vp-account-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .vp-account-table thead {
+    display: none;
+  }
+
+  .vp-account-table td {
+    padding: 0.75rem 1rem;
+    white-space: normal;
+  }
+
+  .vp-account-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: var(--vp-text-secondary);
+  }
 }
 
 .dark .vp-main-layout {
