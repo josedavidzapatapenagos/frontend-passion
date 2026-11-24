@@ -7,11 +7,15 @@ import { RejectDialog } from "@/features/admin-posts/components/RejectDialog";
 import { ReviewToolbar } from "@/features/admin-posts/components/ReviewToolbar";
 import { useNotification } from "@/hooks/useNotification";
 import { usePendingPostsReview } from "@/features/admin-posts/hooks/usePendingPostsReview";
+import { useAccountPermissions } from "@/features/auth/services/accountPermissions";
 
 const REJECTION_MAX_LENGTH = 1000;
 
 export const AdminAdsManagementPage = () => {
   const { success, error: notifyError } = useNotification();
+  const { hasPermission } = useAccountPermissions();
+  const canApprove = hasPermission("POST_REVIEW_APPROVE");
+  const canReject = hasPermission("POST_REVIEW_REJECT");
   const {
     items,
     selectedPostId,
@@ -93,16 +97,24 @@ export const AdminAdsManagementPage = () => {
               loading={Boolean(selectedPostId && loadingDetailId === selectedPostId)}
               processing={selectedPostIsProcessing}
               onBack={closeDetail}
-              onApprove={() => {
-                if (selectedPost) {
-                  requestApprove(selectedPost.id);
-                }
-              }}
-              onReject={() => {
-                if (selectedPost) {
-                  openReject(selectedPost.id);
-                }
-              }}
+              onApprove={
+                canApprove
+                  ? () => {
+                      if (selectedPost) {
+                        requestApprove(selectedPost.id);
+                      }
+                    }
+                  : undefined
+              }
+              onReject={
+                canReject
+                  ? () => {
+                      if (selectedPost) {
+                        openReject(selectedPost.id);
+                      }
+                    }
+                  : undefined
+              }
             />
           </div>
         ) : (

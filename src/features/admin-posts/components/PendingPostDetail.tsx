@@ -9,8 +9,8 @@ type PendingPostDetailProps = {
   loading: boolean;
   processing: boolean;
   onBack: () => void;
-  onApprove: () => void;
-  onReject: () => void;
+  onApprove?: () => void;
+  onReject?: () => void;
 };
 
 const formatDate = (value: string | null): string => {
@@ -87,9 +87,9 @@ export const PendingPostDetail = ({
             description="Revisa cuidadosamente la información antes de aprobar o rechazar la publicación."
           />
 
-          <div className="h-44 w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/10">
+          <div className="flex h-[26rem] w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/10 md:h-[32rem]">
             {post?.coverImageUrl ? (
-              <img src={post.coverImageUrl} alt={post.title} className="h-full w-full object-cover" />
+              <img src={post.coverImageUrl} alt={post.title} className="h-full w-full object-contain" />
             ) : (
               <div className="h-full w-full flex items-center justify-center text-sm text-slate-500 dark:text-white/60">
                 Sin imagen de portada
@@ -126,7 +126,9 @@ export const PendingPostDetail = ({
             </div>
           </div>
 
+          {(onApprove || onReject) && (
           <div className="mt-5 flex flex-col gap-3">
+            {onApprove && (
             <button
               type="button"
               onClick={onApprove}
@@ -135,7 +137,9 @@ export const PendingPostDetail = ({
             >
               {processing ? "Procesando..." : "Aprobar publicacion"}
             </button>
+            )}
 
+            {onReject && (
             <button
               type="button"
               onClick={onReject}
@@ -144,7 +148,9 @@ export const PendingPostDetail = ({
             >
               {processing ? "Procesando..." : "Rechazar publicacion"}
             </button>
+            )}
           </div>
+          )}
         </>
       )}
     </section>

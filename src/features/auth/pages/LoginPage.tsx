@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useNotification } from "@/hooks/useNotification";
 import { AUTH_SESSION_KEY, login, normalizeAccountType } from "@/features/auth/services/authService";
+import { persistAccountPermissions } from "@/features/auth/services/accountPermissions";
 import { getBackendErrorMessage, getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 
 type LoginPayload = {
@@ -21,6 +22,7 @@ type LoginPayload = {
   account_full_name?: string;
   fullName?: string;
   full_name?: string;
+  permissions?: unknown;
 };
 
 type LoginEnvelope = {
@@ -90,6 +92,17 @@ const getAccountTypeFromAuthPayload = (
 
   return normalizeAccountType(sourceValue);
 };
+
+const isEmailVerificationMessage = (message: string): boolean => {
+  const normalized = message.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const mentionsEmail = /email|e-mail|correo/.test(normalized);
+  const mentionsVerification = /verif|confirm/.test(normalized);
+
+  return mentionsEmail && mentionsVerification;
+};
+
+const isSuspendedAccountMessage = (message: string): boolean =>
+  /\b(suspended|suspendid[oa]s?)\b/i.test(message);
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -230,6 +243,8 @@ export const LoginPage = () => {
           accountName
       );
 
+      persistAccountPermissions(authPayload.permissions);
+
       window.dispatchEvent(new Event("auth-changed"));
 
       navigate("/feed");
@@ -241,15 +256,22 @@ export const LoginPage = () => {
         (err as { response?: { data?: { messages?: string[] } } })?.response?.data?.messages;
       const backendMessage = getBackendErrorMessage(err) || "";
 
-      const accountNeedsEmailVerification =
-        status === 409 ||
-        messages?.some((message) =>
-          message.toLowerCase().includes("verificar") && message.toLowerCase().includes("email")
-        ) ||
-        (backendMessage.toLowerCase().includes("verificar") && backendMessage.toLowerCase().includes("email")) ||
-        backendMessage.toLowerCase().includes("email no verificado");
+      const accountIsSuspended =
+        Boolean(status) &&
+        (messages?.some(isSuspendedAccountMessage) ||
+          isSuspendedAccountMessage(backendMessage));
 
-      if (accountNeedsEmailVerification) {
+      const accountNeedsEmailVerification =
+        (status === 400 || status === 403 || status === 409) &&
+        (messages?.some(isEmailVerificationMessage) ||
+          isEmailVerificationMessage(backendMessage));
+
+      if (accountIsSuspended) {
+        notifyError({
+          title: "No pudimos iniciar sesión",
+          description: "Tu cuenta ha sido suspendida.",
+        });
+      } else if (accountNeedsEmailVerification) {
         navigate("/verify-email", {
           state: { email },
         });

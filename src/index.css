@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@heroui/styles";
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
@@ -52,6 +53,28 @@
   --vp-vip-card-strong: rgba(1, 48, 58, 0.92);
   --vp-vip-border: rgba(0, 188, 212, 0.28);
   --vp-vip-muted: rgba(190, 228, 245, 0.84);
+}
+
+/* HeroUI tokens mapped to the Virtual Passion palette. */
+:root {
+  --accent: var(--vp-primary);
+  --accent-foreground: #ffffff;
+  --focus: var(--vp-primary);
+  --border: var(--vp-border);
+  --separator: var(--vp-border);
+  --field-background: var(--vp-input-bg);
+  --field-foreground: var(--vp-text-primary);
+  --field-border: var(--vp-input-border);
+}
+
+.dark {
+  --overlay: #012a33;
+  --overlay-foreground: #ffffff;
+  --surface: #012a33;
+  --surface-secondary: #013440;
+  --default: rgba(255, 255, 255, 0.1);
+  --default-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.6);
 }
 
 html, body, #root {

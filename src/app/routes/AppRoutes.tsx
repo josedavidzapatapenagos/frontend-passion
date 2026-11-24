@@ -24,11 +24,15 @@ import { ModelVipStudioPage } from "@/features/vip-area/pages/ModelVipStudioPage
 import { VipChatPage } from "@/features/vip-area/pages/VipChatPage";
 import { PaymentSuccessPage } from "@/features/payments/pages/PaymentSuccessPage";
 import { PaymentCancelPage } from "@/features/payments/pages/PaymentCancelPage";
+import { CreateAdminAccountPage } from "@/features/super-admin/pages/CreateAdminAccountPage";
+import { AdminAccountsPage, ModelAccountsPage } from "@/features/super-admin/pages/AccountManagementPage";
+import { ADMIN_ROUTE_PERMISSIONS } from "@/constants/navbarMenus";
 import {
   AccountTypeGuard,
   AgeGuard,
   AuthGuard,
   CountryGuard,
+  PermissionGuard,
   ProfileGuard,
 } from "@/app/routes/routeGuards/index";
 import { InitialRouteRedirect } from "@/app/routes/redirects/InitialRouteRedirect";
@@ -171,28 +175,34 @@ export function AppRoutes() {
               />
 
               <Route element={<AccountTypeGuard allowed={["ADMIN", "SUPER_ADMIN"]} />}>
-                <Route
-                  path="/admin/ads"
-                  element={<AdminAdsManagementPage />}
-                />
+                <Route element={<PermissionGuard {...ADMIN_ROUTE_PERMISSIONS.ads} />}>
+                  <Route
+                    path="/admin/ads"
+                    element={<AdminAdsManagementPage />}
+                  />
+                </Route>
 
+                <Route element={<PermissionGuard {...ADMIN_ROUTE_PERMISSIONS.identityVerifications} />}>
+                  <Route
+                    path="/admin/identity-verifications/pending"
+                    element={<AdminIdentityVerificationsPage />}
+                  />
+                </Route>
+              </Route>
+
+              <Route element={<AccountTypeGuard allowed={["SUPER_ADMIN"]} />}>
+                <Route path="/superadmin/admins" element={<AdminAccountsPage />} />
                 <Route
                   path="/admin/plans"
                   element={<AdminPositioningPlansPage />}
                 />
-
                 <Route
                   path="/admin/models"
-                  element={
-                    <div className="min-h-screen p-8 vp-text-primary">
-                      Modelos
-                    </div>
-                  }
+                  element={<ModelAccountsPage />}
                 />
-
                 <Route
-                  path="/admin/identity-verifications/pending"
-                  element={<AdminIdentityVerificationsPage />}
+                  path="/superadmin/admins/create"
+                  element={<CreateAdminAccountPage />}
                 />
               </Route>
             </Route>

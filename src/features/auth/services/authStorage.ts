@@ -6,6 +6,7 @@ export const AUTH_STORAGE_KEYS = {
   accountFullName: "accountFullName",
   accountType: "accountType",
   modelVerificationStatus: "modelVerificationStatus",
+  accountPermissions: "accountPermissions",
 } as const;
 
 export type StoredAuthState = {
@@ -49,4 +50,5 @@ export const clearStoredAuthState = () => {
   localStorage.removeItem(AUTH_STORAGE_KEYS.token);
   localStorage.removeItem(AUTH_STORAGE_KEYS.accessToken);
   localStorage.removeItem(AUTH_STORAGE_KEYS.modelVerificationStatus);
+  localStorage.removeItem(AUTH_STORAGE_KEYS.accountPermissions);
 };

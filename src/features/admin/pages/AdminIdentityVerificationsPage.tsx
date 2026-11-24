@@ -9,9 +9,13 @@ import {
   type PendingIdentityVerification,
 } from "@/features/admin/services/adminIdentityVerificationService";
 import { getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
+import { useAccountPermissions } from "@/features/auth/services/accountPermissions";
 
 export const AdminIdentityVerificationsPage = () => {
   const { success, error: notifyError, warning } = useNotification();
+  const { hasPermission } = useAccountPermissions();
+  const canApprove = hasPermission("MODEL_REGISTRATION_APPROVE");
+  const canReject = hasPermission("MODEL_REGISTRATION_REJECT");
   const [items, setItems] = useState<PendingIdentityVerification[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -152,7 +156,9 @@ export const AdminIdentityVerificationsPage = () => {
                 </p>
               </div>
 
+              {(canApprove || canReject) && (
               <div className="mt-4 flex flex-wrap gap-2">
+                {canApprove && (
                 <button
                   type="button"
                   onClick={() => handleApprove(item.id)}
@@ -161,7 +167,9 @@ export const AdminIdentityVerificationsPage = () => {
                 >
                   Aprobar
                 </button>
+                )}
 
+                {canReject && (
                 <button
                   type="button"
                   onClick={() => {
@@ -172,9 +180,11 @@ export const AdminIdentityVerificationsPage = () => {
                 >
                   Rechazar
                 </button>
+                )}
               </div>
+              )}
 
-              {selectedRejectId === item.id && (
+              {canReject && selectedRejectId === item.id && (
                 <div className="mt-3 space-y-2">
                   <textarea
                     value={rejectionReason}

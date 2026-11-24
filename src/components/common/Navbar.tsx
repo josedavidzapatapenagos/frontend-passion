@@ -1,11 +1,19 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { ThemeSwitcher } from "@/components/common/ThemeSwitcher";
+import { NavbarDropdownMenu } from "@/components/common/NavbarDropdownMenu";
 import { useEffect, useState } from "react";
-import { ROLE_NAVBAR_MENUS, type NavbarRole } from "@/constants/navbarMenus";
+import {
+  ROLE_NAVBAR_MENUS,
+  isNavbarGroupItem,
+  type NavbarGroupItem,
+  type NavbarLinkItem,
+  type NavbarRole,
+} from "@/constants/navbarMenus";
 import { useModelProfileAccess } from "@/features/account/hooks/useModelAccess";
 import { getIdentityVerificationStatus } from "@/features/identity-verification/services/identityVerificationService";
 import { normalizeAccountType } from "@/features/auth/services/authService";
 import { clearStoredAuthState, readStoredAuthState } from "@/features/auth/services/authStorage";
+import { useAccountPermissions } from "@/features/auth/services/accountPermissions";
 
 type AuthSnapshot = {
   accountName: string | null;
@@ -18,6 +26,10 @@ type NavbarItemState = {
   path: string;
   disabled?: boolean;
 };
+
+type VisibleNavbarItem =
+  | ({ kind: "link" } & NavbarItemState)
+  | ({ kind: "group" } & NavbarGroupItem);
 
 const isNavbarRole = (value: string | null): value is NavbarRole => {
   return value === "USER" || value === "CLIENT" || value === "MODEL" || value === "ADMIN" || value === "SUPER_ADMIN";
@@ -56,6 +68,7 @@ export const Navbar = () => {
   const navbarRole = isNavbarRole(role) ? role : null;
   const isLogged = authSnapshot.isLogged;
   const { accountApproved, hasCompletedOnboarding, profile } = useModelProfileAccess();
+  const { can, resolved: permissionsResolved } = useAccountPermissions();
   const hasVipAreaEnabled = Boolean(profile?.vipAreaId?.trim());
 
   const [modelVerificationStatus, setModelVerificationStatus] = useState<string | null>(
@@ -136,18 +149,26 @@ export const Navbar = () => {
   }, [isLogged, role, modelVerificationStatus]); // Agregado status a las dependencias para evitar cierres obsoletos
 
   const menuItems = navbarRole ? ROLE_NAVBAR_MENUS[navbarRole] : [];
-  const normalizedMenuItems: NavbarItemState[] = menuItems.map((item) => ({
-    label: item.label,
-    path: item.path,
-  }));
+  const isAllowed = (item: NavbarLinkItem) => !item.requires || can(item.requires);
+
+  const normalizedMenuItems: VisibleNavbarItem[] = menuItems
+    .map((item): VisibleNavbarItem | null => {
+      if (isNavbarGroupItem(item)) {
+        const children = item.children.filter(isAllowed);
+        return children.length > 0 ? { kind: "group", ...item, children } : null;
+      }
+
+      return isAllowed(item) ? { kind: "link", label: item.label, path: item.path } : null;
+    })
+    .filter((item): item is VisibleNavbarItem => Boolean(item));
 
   // Modelos sin aprobación quedan en Cuenta; modelos aprobadas sin perfil quedan en Perfil.
-  const visibleMenuItems: NavbarItemState[] =
+  const visibleMenuItems: VisibleNavbarItem[] =
     role !== "MODEL"
       ? normalizedMenuItems
       : normalizedMenuItems
-          .map((item) => {
-            if (item.path === "/account") {
+          .map((item): VisibleNavbarItem | null => {
+            if (item.kind !== "link" || item.path === "/account") {
               return item;
             }
 
@@ -180,7 +201,7 @@ export const Navbar = () => {
 
             return item;
           })
-          .filter((item): item is NavbarItemState => Boolean(item));
+          .filter((item): item is VisibleNavbarItem => Boolean(item));
 
   const handleLogout = () => {
     clearStoredAuthState();
@@ -268,6 +289,11 @@ export const Navbar = () => {
                     {modelVerificationStatus || "NO_VERIFICADA"}
                   </p>
                 )}
+                {role === "ADMIN" && !permissionsResolved && (
+                  <p role="status" className="mt-2 text-xs text-amber-700 dark:text-amber-300">
+                    No se pudieron obtener tus permisos. Inicia sesión de nuevo; si el problema continúa, contacta al superadministrador.
+                  </p>
+                )}
               </div>
             )}
 
@@ -288,7 +314,17 @@ export const Navbar = () => {
               </div>
             ) : (
               <nav className="mt-6 flex flex-col gap-2">
-                {visibleMenuItems.map((item) => (
+                {visibleMenuItems.map((item) =>
+                  item.kind === "group" ? (
+                    <NavbarDropdownMenu
+                      key={item.basePath}
+                      item={item}
+                      isActive={location.pathname.startsWith(item.basePath)}
+                      activePath={location.pathname}
+                      isLargeScreen={isLargeScreen}
+                      onNavigate={handleNavigate}
+                    />
+                  ) : (
                   <button
                     key={item.path}
                     onClick={() => {
@@ -312,7 +348,8 @@ export const Navbar = () => {
                   >
                     {item.label}
                   </button>
-                ))}
+                  )
+                )}
               </nav>
             )}
 

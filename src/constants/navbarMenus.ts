@@ -1,4 +1,47 @@
-export const ROLE_NAVBAR_MENUS = {
+import type { AdminPermission } from "@/features/auth/constants/adminPermissions";
+import type { PermissionRequirement } from "@/features/auth/services/accountPermissions";
+
+export type NavbarLinkItem = {
+  label: string;
+  path: string;
+  /** Only evaluated for ADMIN accounts; SUPER_ADMIN always has access. */
+  requires?: PermissionRequirement;
+};
+
+export type NavbarGroupItem = {
+  label: string;
+  /** Path prefix used to highlight the group when one of its children is active. */
+  basePath: string;
+  children: Array<NavbarLinkItem & { description?: string }>;
+};
+
+export type NavbarMenuItem = NavbarLinkItem | NavbarGroupItem;
+
+export const isNavbarGroupItem = (item: NavbarMenuItem): item is NavbarGroupItem =>
+  "children" in item;
+
+const anyOf = (...permissions: AdminPermission[]): PermissionRequirement => ({ anyOf: permissions });
+
+export const ADMIN_ROUTE_PERMISSIONS = {
+  ads: anyOf("POST_REVIEW_LIST_VIEW"),
+  identityVerifications: anyOf("MODEL_REGISTRATION_LIST_VIEW"),
+  models: anyOf("MODEL_ACCOUNT_SUSPEND", "MODEL_ACCOUNT_UNSUSPEND"),
+} as const satisfies Record<string, PermissionRequirement>;
+
+const ADMIN_PANEL_ITEMS: NavbarLinkItem[] = [
+  { label: "Cuenta", path: "/account" },
+  { label: "Administración anuncios", path: "/admin/ads", requires: ADMIN_ROUTE_PERMISSIONS.ads },
+  {
+    label: "Verificación de identidad",
+    path: "/admin/identity-verifications/pending",
+    requires: ADMIN_ROUTE_PERMISSIONS.identityVerifications,
+  },
+];
+
+export const ROLE_NAVBAR_MENUS: Record<
+  "USER" | "CLIENT" | "MODEL" | "ADMIN" | "SUPER_ADMIN",
+  NavbarMenuItem[]
+> = {
   USER: [
     { label: "Mi Perfil", path: "/account" },
     { label: "Explorar", path: "/feed" },
@@ -15,21 +58,30 @@ export const ROLE_NAVBAR_MENUS = {
     { label: "Anuncios", path: "/ads" },
     { label: "VIP", path: "/vip/manage" },
   ],
-  ADMIN: [
-    { label: "Cuenta", path: "/account" },
-    { label: "Administración anuncios", path: "/admin/ads" },
-    { label: "Posicionamientos", path: "/admin/plans" },
-    { label: "Verificación de identidad", path: "/admin/identity-verifications/pending" },
-    { label: "Modelos", path: "/admin/models" },
-  ],
+  ADMIN: ADMIN_PANEL_ITEMS,
   SUPER_ADMIN: [
-    { label: "Cuenta", path: "/account" },
-    { label: "Administración anuncios", path: "/admin/ads" },
+    ...ADMIN_PANEL_ITEMS.slice(0, 2),
     { label: "Posicionamientos", path: "/admin/plans" },
-    { label: "Verificación de identidad", path: "/admin/identity-verifications/pending" },
-    { label: "Modelos", path: "/admin/models" },
+    ...ADMIN_PANEL_ITEMS.slice(2),
+    { label: "Modelos", path: "/admin/models", requires: ADMIN_ROUTE_PERMISSIONS.models },
+    {
+      label: "Administradores",
+      basePath: "/superadmin/admins",
+      children: [
+        {
+          label: "Ver administradores",
+          path: "/superadmin/admins",
+          description: "Consulta cuentas y gestiona sus permisos",
+        },
+        {
+          label: "Crear administrador",
+          path: "/superadmin/admins/create",
+          description: "Registra una cuenta y asigna permisos",
+        },
+      ],
+    },
   ],
-} as const;
+};
 
 export type NavbarRole = keyof typeof ROLE_NAVBAR_MENUS;
 

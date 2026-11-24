@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useNotification } from "@/hooks/useNotification";
 import { verifyEmail } from "@/features/auth/services/authService";
 import { getUserFacingErrorMessage } from "@/utils/errors/errorMapper";
 
 export const VerifyEmailPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = (location.state as { email?: string } | null)?.email;
   const { success: notifySuccess, error: notifyError } = useNotification();
 
   const [token, setToken] = useState("");
@@ -16,10 +18,19 @@ export const VerifyEmailPage = () => {
   ) => {
     e.preventDefault();
 
+    if (loading) return;
+    if (!token.trim()) {
+      notifyError({
+        title: "Ingresa el código de verificación",
+        description: "Escribe el código que recibiste por correo electrónico.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await verifyEmail(token);
+      const response = await verifyEmail(token.trim());
 
       notifySuccess({
         title: "Correo verificado",
@@ -28,9 +39,10 @@ export const VerifyEmailPage = () => {
           "Correo verificado correctamente.",
       });
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      navigate("/login", {
+        replace: true,
+        state: { email },
+      });
     } catch (err: unknown) {
       notifyError({
         title: "No pudimos verificar el correo",
@@ -65,6 +77,10 @@ export const VerifyEmailPage = () => {
             <input
               type="text"
               placeholder="Código de verificación"
+              aria-label="Código de verificación"
+              autoComplete="one-time-code"
+              required
+              disabled={loading}
               value={token}
               onChange={(e) =>
                 setToken(e.target.value)
